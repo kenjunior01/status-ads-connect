@@ -10,198 +10,20 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
-      campaigns: {
-        Row: {
-          advertiser_id: string
-          completed_at: string | null
-          created_at: string
-          creator_id: string
-          description: string | null
-          id: string
-          price: number
-          status: string
-          title: string
-        }
-        Insert: {
-          advertiser_id: string
-          completed_at?: string | null
-          created_at?: string
-          creator_id: string
-          description?: string | null
-          id?: string
-          price: number
-          status?: string
-          title: string
-        }
-        Update: {
-          advertiser_id?: string
-          completed_at?: string | null
-          created_at?: string
-          creator_id?: string
-          description?: string | null
-          id?: string
-          price?: number
-          status?: string
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "campaigns_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          badge_level: string | null
-          bio: string | null
-          created_at: string
-          display_name: string | null
-          id: string
-          is_verified: boolean | null
-          niche: string | null
-          price_per_post: number | null
-          rating: number | null
-          total_campaigns: number | null
-          total_reviews: number | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          avatar_url?: string | null
-          badge_level?: string | null
-          bio?: string | null
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          is_verified?: boolean | null
-          niche?: string | null
-          price_per_post?: number | null
-          rating?: number | null
-          total_campaigns?: number | null
-          total_reviews?: number | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          avatar_url?: string | null
-          badge_level?: string | null
-          bio?: string | null
-          created_at?: string
-          display_name?: string | null
-          id?: string
-          is_verified?: boolean | null
-          niche?: string | null
-          price_per_post?: number | null
-          rating?: number | null
-          total_campaigns?: number | null
-          total_reviews?: number | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      reviews: {
-        Row: {
-          advertiser_id: string
-          campaign_id: string | null
-          comment: string | null
-          created_at: string
-          creator_id: string
-          id: string
-          rating: number
-        }
-        Insert: {
-          advertiser_id: string
-          campaign_id?: string | null
-          comment?: string | null
-          created_at?: string
-          creator_id: string
-          id?: string
-          rating: number
-        }
-        Update: {
-          advertiser_id?: string
-          campaign_id?: string | null
-          comment?: string | null
-          created_at?: string
-          creator_id?: string
-          id?: string
-          rating?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_campaign_id_fkey"
-            columns: ["campaign_id"]
-            isOneToOne: false
-            referencedRelation: "campaigns"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
-      user_roles: {
-        Row: {
-          created_at: string | null
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      create_admin_user: {
-        Args: { admin_email: string; admin_password: string }
-        Returns: string
-      }
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["app_role"]
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      make_user_admin: {
-        Args: { user_email: string }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "creator" | "advertiser" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -328,8 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "creator", "advertiser", "user"],
-    },
+    Enums: {},
   },
 } as const
