@@ -14,16 +14,227 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      campaigns: {
+        Row: {
+          advertiser_id: string
+          completed_at: string | null
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          id: string
+          price: number
+          status: string | null
+          title: string
+        }
+        Insert: {
+          advertiser_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          id?: string
+          price: number
+          status?: string | null
+          title: string
+        }
+        Update: {
+          advertiser_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          id?: string
+          price?: number
+          status?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      creator_listings: {
+        Row: {
+          badge_level: string | null
+          created_at: string | null
+          display_name: string
+          id: string
+          is_verified: boolean | null
+          niche: string | null
+          price_range: string | null
+          profile_id: string | null
+          rating: number | null
+          total_campaigns: number | null
+          total_reviews: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          badge_level?: string | null
+          created_at?: string | null
+          display_name: string
+          id?: string
+          is_verified?: boolean | null
+          niche?: string | null
+          price_range?: string | null
+          profile_id?: string | null
+          rating?: number | null
+          total_campaigns?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          badge_level?: string | null
+          created_at?: string | null
+          display_name?: string
+          id?: string
+          is_verified?: boolean | null
+          niche?: string | null
+          price_range?: string | null
+          profile_id?: string | null
+          rating?: number | null
+          total_campaigns?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_listings_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          badge_level: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          is_verified: boolean | null
+          niche: string | null
+          price_per_post: number | null
+          price_range: string | null
+          rating: number | null
+          total_campaigns: number | null
+          total_reviews: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          badge_level?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          niche?: string | null
+          price_per_post?: number | null
+          price_range?: string | null
+          rating?: number | null
+          total_campaigns?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          badge_level?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          is_verified?: boolean | null
+          niche?: string | null
+          price_per_post?: number | null
+          price_range?: string | null
+          rating?: number | null
+          total_campaigns?: number | null
+          total_reviews?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          advertiser_id: string
+          campaign_id: string | null
+          comment: string | null
+          created_at: string | null
+          creator_id: string
+          id: string
+          rating: number
+        }
+        Insert: {
+          advertiser_id: string
+          campaign_id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          creator_id: string
+          id?: string
+          rating: number
+        }
+        Update: {
+          advertiser_id?: string
+          campaign_id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          creator_id?: string
+          id?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "creator" | "advertiser" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +361,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "creator", "advertiser", "user"],
+    },
   },
 } as const
