@@ -24,21 +24,27 @@ export const useProfiles = () => {
   const fetchProfiles = async () => {
     try {
       setLoading(true);
-      // Using manual typing since creator_listings table is new
-      const { data, error } = await supabase
+      setError(null);
+      
+      // Using type assertion since creator_listings is a new table
+      const { data, error } = await (supabase
         .from('creator_listings' as any)
         .select('*')
         .not('display_name', 'is', null)
         .order('rating', { ascending: false })
-        .limit(50) as { data: any[] | null, error: any };
+        .limit(50)) as { data: Profile[] | null; error: any };
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        throw error;
+      }
 
-      // Return actual data without sample fallback
       setProfiles(data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar perfis';
+      setError(errorMessage);
       console.error('Error fetching profiles:', err);
+      setProfiles([]);
     } finally {
       setLoading(false);
     }
