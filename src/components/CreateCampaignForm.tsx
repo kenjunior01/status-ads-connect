@@ -6,50 +6,32 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { useCampaigns } from "@/hooks/useCampaigns";
+import { useProfiles } from "@/hooks/useProfiles";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { 
   Calendar as CalendarIcon, 
   Plus, 
   Target, 
-  DollarSign, 
-  Users, 
-  FileText,
-  Image,
   ChevronRight,
   ChevronLeft,
   Check,
-  Sparkles
+  Sparkles,
+  Loader2,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface CampaignData {
-  title: string;
-  description: string;
-  category: string;
-  budget: number;
-  deadline: Date | undefined;
-  targetNiches: string[];
-  requirements: string;
-  deliverables: string;
-  autoApprove: boolean;
-}
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface CreateCampaignFormProps {
-  onSubmit?: (data: CampaignData) => void;
+  onSubmit?: () => void;
   onCancel?: () => void;
 }
-
-const niches = [
-  "Beleza", "Fitness", "Tecnologia", "Gastronomia", "Viagens", 
-  "Moda", "Lifestyle", "Negócios", "Educação", "Entretenimento"
-];
 
 const categories = [
   { value: "product", label: "Divulgação de Produto" },
@@ -60,49 +42,34 @@ const categories = [
 ];
 
 export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormProps) => {
-  const { toast } = useToast();
+  const { createCampaign, creating } = useCampaigns();
+  const { profiles, loading: loadingProfiles } = useProfiles();
+  
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<CampaignData>({
+  const [formData, setFormData] = useState({
     title: "",
     description: "",
     category: "",
     budget: 200,
-    deadline: undefined,
-    targetNiches: [],
-    requirements: "",
-    deliverables: "",
-    autoApprove: false,
+    deadline: undefined as Date | undefined,
+    selectedCreatorId: "",
   });
 
-  const totalSteps = 4;
-
-  const handleNicheToggle = (niche: string) => {
-    setFormData(prev => ({
-      ...prev,
-      targetNiches: prev.targetNiches.includes(niche)
-        ? prev.targetNiches.filter(n => n !== niche)
-        : [...prev.targetNiches, niche]
-    }));
-  };
+  const totalSteps = 3;
 
   const handleSubmit = async () => {
-    setLoading(true);
+    if (!formData.selectedCreatorId) return;
+    
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      onSubmit?.(formData);
-      toast({
-        title: "Campanha criada!",
-        description: "Sua campanha foi criada com sucesso e está aguardando aprovação.",
+      await createCampaign({
+        title: formData.title,
+        description: formData.description,
+        price: formData.budget,
+        creator_id: formData.selectedCreatorId,
       });
+      onSubmit?.();
     } catch (error) {
-      toast({
-        title: "Erro ao criar campanha",
-        description: "Ocorreu um erro. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+      // Error handled in hook
     }
   };
 
@@ -111,11 +78,9 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
       case 1:
         return formData.title && formData.category;
       case 2:
-        return formData.budget > 0 && formData.deadline;
+        return formData.budget > 0;
       case 3:
-        return formData.targetNiches.length > 0;
-      case 4:
-        return true;
+        return formData.selectedCreatorId;
       default:
         return false;
     }
@@ -129,9 +94,9 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
             className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center font-medium transition-colors",
               step > index + 1
-                ? "bg-success text-white"
+                ? "bg-primary text-primary-foreground"
                 : step === index + 1
-                ? "bg-primary text-white"
+                ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground"
             )}
           >
@@ -141,7 +106,7 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
             <div
               className={cn(
                 "w-16 h-1 mx-2",
-                step > index + 1 ? "bg-success" : "bg-muted"
+                step > index + 1 ? "bg-primary" : "bg-muted"
               )}
             />
           )}
@@ -216,7 +181,7 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
       </div>
 
       <div>
-        <Label>Data Limite *</Label>
+        <Label>Data Limite (opcional)</Label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -243,69 +208,57 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
           </PopoverContent>
         </Popover>
       </div>
-
-      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-        <div>
-          <Label>Aprovação Automática</Label>
-          <p className="text-sm text-muted-foreground">
-            Aprovar automaticamente criadores verificados
-          </p>
-        </div>
-        <Switch
-          checked={formData.autoApprove}
-          onCheckedChange={(checked) => setFormData({ ...formData, autoApprove: checked })}
-        />
-      </div>
     </div>
   );
 
   const renderStep3 = () => (
     <div className="space-y-6">
       <div>
-        <Label>Nichos Alvo *</Label>
+        <Label>Selecione um Criador *</Label>
         <p className="text-sm text-muted-foreground mb-4">
-          Selecione os nichos de criadores que deseja alcançar
+          Escolha o criador que receberá sua proposta
         </p>
-        <div className="flex flex-wrap gap-2">
-          {niches.map((niche) => (
-            <Badge
-              key={niche}
-              variant={formData.targetNiches.includes(niche) ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary hover:text-white transition-colors"
-              onClick={() => handleNicheToggle(niche)}
-            >
-              {niche}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="requirements">Requisitos para Criadores</Label>
-        <Textarea
-          id="requirements"
-          value={formData.requirements}
-          onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-          placeholder="Ex: Mínimo 1000 seguidores, conta verificada..."
-          className="mt-2"
-          rows={3}
-        />
-      </div>
-    </div>
-  );
-
-  const renderStep4 = () => (
-    <div className="space-y-6">
-      <div>
-        <Label htmlFor="deliverables">O que o criador deve entregar</Label>
-        <Textarea
-          id="deliverables"
-          value={formData.deliverables}
-          onChange={(e) => setFormData({ ...formData, deliverables: e.target.value })}
-          placeholder="Ex: 3 stories com link, 1 post no feed mencionando a marca..."
-          className="mt-2"
-          rows={4}
-        />
+        
+        {loadingProfiles ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        ) : profiles.length === 0 ? (
+          <div className="text-center p-8 text-muted-foreground">
+            Nenhum criador disponível no momento
+          </div>
+        ) : (
+          <div className="grid gap-3 max-h-[300px] overflow-y-auto">
+            {profiles.slice(0, 10).map((profile) => (
+              <div
+                key={profile.id}
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
+                  formData.selectedCreatorId === profile.profile_id
+                    ? "border-primary bg-primary/5"
+                    : "hover:bg-muted/50"
+                )}
+                onClick={() => setFormData({ ...formData, selectedCreatorId: profile.profile_id || profile.id })}
+              >
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    <User className="h-5 w-5" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p className="font-medium">{profile.display_name}</p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {profile.niche && <Badge variant="secondary">{profile.niche}</Badge>}
+                    {profile.price_range && <span>{profile.price_range}</span>}
+                  </div>
+                </div>
+                {formData.selectedCreatorId === profile.profile_id && (
+                  <Check className="h-5 w-5 text-primary" />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Summary */}
@@ -329,17 +282,13 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Orçamento:</span>
-            <span className="font-medium text-success">R$ {formData.budget}</span>
+            <span className="font-medium text-primary">R$ {formData.budget}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Prazo:</span>
             <span className="font-medium">
-              {formData.deadline ? format(formData.deadline, "dd/MM/yyyy") : "-"}
+              {formData.deadline ? format(formData.deadline, "dd/MM/yyyy") : "Sem prazo"}
             </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Nichos:</span>
-            <span className="font-medium">{formData.targetNiches.join(", ") || "-"}</span>
           </div>
         </CardContent>
       </Card>
@@ -357,8 +306,7 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
           <CardDescription>
             {step === 1 && "Defina as informações básicas da sua campanha"}
             {step === 2 && "Configure o orçamento e prazo"}
-            {step === 3 && "Selecione o público-alvo"}
-            {step === 4 && "Revise e finalize"}
+            {step === 3 && "Selecione o criador e revise"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -367,7 +315,6 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}
-          {step === 4 && renderStep4()}
 
           <div className="flex justify-between mt-8">
             <Button
@@ -384,10 +331,10 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
                 <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={loading}>
-                {loading ? (
+              <Button onClick={handleSubmit} disabled={creating || !canProceed()}>
+                {creating ? (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Criando...
                   </div>
                 ) : (

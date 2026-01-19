@@ -1,123 +1,32 @@
 import { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useConversations, useMessages } from "@/hooks/useConversations";
 import { 
   Send, 
   MessageSquare, 
   Search, 
   MoreVertical,
-  Phone,
-  Video,
-  Paperclip,
-  Smile,
   Check,
   CheckCheck,
-  Circle
+  Circle,
+  Loader2
 } from "lucide-react";
 
-interface Message {
-  id: string;
-  senderId: string;
-  content: string;
-  timestamp: Date;
-  status: 'sent' | 'delivered' | 'read';
-}
-
-interface Conversation {
-  id: string;
-  participantName: string;
-  participantAvatar?: string;
-  lastMessage: string;
-  lastMessageTime: Date;
-  unreadCount: number;
-  isOnline: boolean;
-  campaignTitle?: string;
-}
-
-interface ChatSystemProps {
-  userId?: string;
-  onClose?: () => void;
-}
-
-const mockConversations: Conversation[] = [
-  {
-    id: "1",
-    participantName: "Maria Beauty",
-    lastMessage: "Olá! Vi que você está interessado na campanha",
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 5),
-    unreadCount: 2,
-    isOnline: true,
-    campaignTitle: "Produto de Beleza Natural"
-  },
-  {
-    id: "2",
-    participantName: "Fitness Ana",
-    lastMessage: "Perfeito, vou preparar o conteúdo!",
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 30),
-    unreadCount: 0,
-    isOnline: false,
-    campaignTitle: "App de Fitness"
-  },
-  {
-    id: "3",
-    participantName: "Tech João",
-    lastMessage: "Quando podemos agendar a gravação?",
-    lastMessageTime: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    unreadCount: 1,
-    isOnline: true,
-    campaignTitle: "Curso Online"
-  },
-];
-
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    senderId: "other",
-    content: "Olá! Vi que você está interessado na campanha de beleza.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 30),
-    status: 'read'
-  },
-  {
-    id: "2",
-    senderId: "me",
-    content: "Sim! Adorei a proposta. Qual seria o prazo de entrega?",
-    timestamp: new Date(Date.now() - 1000 * 60 * 25),
-    status: 'read'
-  },
-  {
-    id: "3",
-    senderId: "other",
-    content: "O prazo é de 5 dias úteis após a aprovação do briefing.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 20),
-    status: 'read'
-  },
-  {
-    id: "4",
-    senderId: "me",
-    content: "Ótimo! Podemos começar quando?",
-    timestamp: new Date(Date.now() - 1000 * 60 * 15),
-    status: 'delivered'
-  },
-  {
-    id: "5",
-    senderId: "other",
-    content: "Podemos começar agora mesmo! Vou enviar o briefing detalhado.",
-    timestamp: new Date(Date.now() - 1000 * 60 * 5),
-    status: 'read'
-  },
-];
-
-export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+export const ChatSystem = () => {
+  const { conversations, loading: loadingConversations, currentUserId } = useConversations();
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const { messages, loading: loadingMessages, sendMessage } = useMessages(selectedConversationId);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -127,26 +36,26 @@ export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || sending) return;
 
-    const message: Message = {
-      id: Date.now().toString(),
-      senderId: "me",
-      content: newMessage,
-      timestamp: new Date(),
-      status: 'sent'
-    };
-
-    setMessages([...messages, message]);
-    setNewMessage("");
+    setSending(true);
+    try {
+      await sendMessage(newMessage);
+      setNewMessage("");
+    } finally {
+      setSending(false);
+    }
   };
 
-  const formatTime = (date: Date) => {
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
     return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const minutes = Math.floor(diff / 1000 / 60);
@@ -158,7 +67,7 @@ export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
     return `${days}d`;
   };
 
-  const MessageStatus = ({ status }: { status: Message['status'] }) => {
+  const MessageStatus = ({ status }: { status: string }) => {
     switch (status) {
       case 'sent':
         return <Check className="h-3 w-3 text-muted-foreground" />;
@@ -166,13 +75,23 @@ export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
         return <CheckCheck className="h-3 w-3 text-muted-foreground" />;
       case 'read':
         return <CheckCheck className="h-3 w-3 text-primary" />;
+      default:
+        return null;
     }
   };
 
-  const filteredConversations = mockConversations.filter(c =>
-    c.participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.campaignTitle?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredConversations = conversations.filter(c =>
+    c.other_participant?.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.campaign?.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (loadingConversations) {
+    return (
+      <div className="flex h-[600px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-[600px] rounded-lg border bg-card overflow-hidden">
@@ -192,52 +111,57 @@ export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
         </div>
 
         <ScrollArea className="flex-1">
-          {filteredConversations.map((conversation) => (
-            <div
-              key={conversation.id}
-              className={`p-4 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
-                selectedConversation?.id === conversation.id ? 'bg-muted' : ''
-              }`}
-              onClick={() => setSelectedConversation(conversation)}
-            >
-              <div className="flex items-start gap-3">
-                <div className="relative">
-                  <Avatar className="h-12 w-12">
-                    <AvatarImage src={conversation.participantAvatar} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
-                      {conversation.participantName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  {conversation.isOnline && (
-                    <Circle className="absolute bottom-0 right-0 h-3 w-3 fill-success text-success" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start">
-                    <p className="font-medium truncate">{conversation.participantName}</p>
-                    <span className="text-xs text-muted-foreground">
-                      {formatDate(conversation.lastMessageTime)}
-                    </span>
+          {filteredConversations.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">
+              Nenhuma conversa encontrada
+            </div>
+          ) : (
+            filteredConversations.map((conversation) => (
+              <div
+                key={conversation.id}
+                className={`p-4 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
+                  selectedConversationId === conversation.id ? 'bg-muted' : ''
+                }`}
+                onClick={() => setSelectedConversationId(conversation.id)}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="relative">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={conversation.other_participant?.avatar_url || undefined} />
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {conversation.other_participant?.display_name?.charAt(0) || '?'}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
-                  {conversation.campaignTitle && (
-                    <Badge variant="secondary" className="text-xs mt-1 mb-1">
-                      {conversation.campaignTitle}
-                    </Badge>
-                  )}
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm text-muted-foreground truncate">
-                      {conversation.lastMessage}
-                    </p>
-                    {conversation.unreadCount > 0 && (
-                      <Badge className="bg-primary text-white text-xs">
-                        {conversation.unreadCount}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                      <p className="font-medium truncate">
+                        {conversation.other_participant?.display_name || 'Usuário'}
+                      </p>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDate(conversation.last_message_at)}
+                      </span>
+                    </div>
+                    {conversation.campaign && (
+                      <Badge variant="secondary" className="text-xs mt-1 mb-1">
+                        {conversation.campaign.title}
                       </Badge>
                     )}
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm text-muted-foreground truncate">
+                        {conversation.last_message || 'Nenhuma mensagem'}
+                      </p>
+                      {(conversation.unread_count || 0) > 0 && (
+                        <Badge className="bg-primary text-primary-foreground text-xs">
+                          {conversation.unread_count}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </ScrollArea>
       </div>
 
@@ -249,78 +173,83 @@ export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
             <div className="p-4 border-b flex justify-between items-center bg-muted/30">
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={selectedConversation.participantAvatar} />
+                  <AvatarImage src={selectedConversation.other_participant?.avatar_url || undefined} />
                   <AvatarFallback className="bg-primary/10 text-primary">
-                    {selectedConversation.participantName.charAt(0)}
+                    {selectedConversation.other_participant?.display_name?.charAt(0) || '?'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{selectedConversation.participantName}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedConversation.isOnline ? 'Online' : 'Offline'}
+                  <p className="font-medium">
+                    {selectedConversation.other_participant?.display_name || 'Usuário'}
                   </p>
+                  {selectedConversation.campaign && (
+                    <p className="text-xs text-muted-foreground">
+                      {selectedConversation.campaign.title}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon">
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <Video className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
             </div>
 
             {/* Messages */}
             <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.senderId === 'me' ? 'justify-end' : 'justify-start'}`}
-                  >
+              {loadingMessages ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  Nenhuma mensagem ainda. Comece a conversa!
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((message) => (
                     <div
-                      className={`max-w-[70%] rounded-2xl px-4 py-2 ${
-                        message.senderId === 'me'
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-muted rounded-bl-md'
-                      }`}
+                      key={message.id}
+                      className={`flex ${message.sender_id === currentUserId ? 'justify-end' : 'justify-start'}`}
                     >
-                      <p className="text-sm">{message.content}</p>
-                      <div className={`flex items-center justify-end gap-1 mt-1 ${
-                        message.senderId === 'me' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                      }`}>
-                        <span className="text-xs">{formatTime(message.timestamp)}</span>
-                        {message.senderId === 'me' && <MessageStatus status={message.status} />}
+                      <div
+                        className={`max-w-[70%] rounded-2xl px-4 py-2 ${
+                          message.sender_id === currentUserId
+                            ? 'bg-primary text-primary-foreground rounded-br-md'
+                            : 'bg-muted rounded-bl-md'
+                        }`}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <div className={`flex items-center justify-end gap-1 mt-1 ${
+                          message.sender_id === currentUserId ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                        }`}>
+                          <span className="text-xs">{formatTime(message.created_at)}</span>
+                          {message.sender_id === currentUserId && <MessageStatus status={message.status} />}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
             </ScrollArea>
 
             {/* Message Input */}
             <div className="p-4 border-t">
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
                 <Input
                   placeholder="Digite sua mensagem..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   className="flex-1"
+                  disabled={sending}
                 />
-                <Button variant="ghost" size="icon">
-                  <Smile className="h-4 w-4" />
-                </Button>
-                <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
-                  <Send className="h-4 w-4" />
+                <Button onClick={handleSendMessage} disabled={!newMessage.trim() || sending}>
+                  {sending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -342,11 +271,11 @@ export const ChatSystem = ({ userId, onClose }: ChatSystemProps) => {
 };
 
 // Chat Button Component
-export const ChatButton = ({ conversation, onClick }: { conversation?: Conversation; onClick: () => void }) => {
+export const ChatButton = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm" onClick={onClick}>
+        <Button variant="outline" size="sm">
           <MessageSquare className="h-4 w-4 mr-2" />
           Chat
         </Button>

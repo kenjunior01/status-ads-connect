@@ -1,40 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/hooks/use-toast";
-import { Camera, Save, User } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
+import { Camera, Save, User, Loader2 } from "lucide-react";
 
-interface ProfileData {
-  display_name: string;
-  bio: string;
-  niche: string;
-  price_range: string;
-  avatar_url: string;
-  is_verified: boolean;
-}
-
-interface ProfileEditFormProps {
-  initialData?: Partial<ProfileData>;
-  onSave?: (data: ProfileData) => void;
-}
-
-export const ProfileEditForm = ({ initialData, onSave }: ProfileEditFormProps) => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<ProfileData>({
-    display_name: initialData?.display_name || "",
-    bio: initialData?.bio || "",
-    niche: initialData?.niche || "",
-    price_range: initialData?.price_range || "",
-    avatar_url: initialData?.avatar_url || "",
-    is_verified: initialData?.is_verified || false,
+export const ProfileEditForm = () => {
+  const { profile, loading, saving, updateProfile } = useProfile();
+  
+  const [formData, setFormData] = useState({
+    display_name: "",
+    bio: "",
+    niche: "",
+    price_range: "",
+    avatar_url: "",
   });
+
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        display_name: profile.display_name || "",
+        bio: profile.bio || "",
+        niche: profile.niche || "",
+        price_range: profile.price_range || "",
+        avatar_url: profile.avatar_url || "",
+      });
+    }
+  }, [profile]);
 
   const niches = [
     "Beleza",
@@ -58,28 +54,16 @@ export const ProfileEditForm = ({ initialData, onSave }: ProfileEditFormProps) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      onSave?.(formData);
-      
-      toast({
-        title: "Perfil atualizado!",
-        description: "Suas informações foram salvas com sucesso.",
-      });
-    } catch (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao atualizar seu perfil.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    await updateProfile(formData);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -183,32 +167,11 @@ export const ProfileEditForm = ({ initialData, onSave }: ProfileEditFormProps) =
         </CardContent>
       </Card>
 
-      {/* Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Preferências</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Perfil Público</Label>
-              <p className="text-sm text-muted-foreground">
-                Permita que anunciantes encontrem seu perfil
-              </p>
-            </div>
-            <Switch
-              checked={formData.is_verified}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_verified: checked })}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Submit Button */}
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? (
+      <Button type="submit" className="w-full" disabled={saving}>
+        {saving ? (
           <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white" />
+            <Loader2 className="h-4 w-4 animate-spin" />
             Salvando...
           </div>
         ) : (
