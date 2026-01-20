@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useConversations, useMessages } from "@/hooks/useConversations";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Send, 
   MessageSquare, 
@@ -13,28 +14,77 @@ import {
   MoreVertical,
   Check,
   CheckCheck,
-  Circle,
-  Loader2
+  Loader2,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 
 export const ChatSystem = () => {
-  const { conversations, loading: loadingConversations, currentUserId } = useConversations();
+  const { conversations, loading: loadingConversations, currentUserId, refetch: refetchConversations } = useConversations();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const { messages, loading: loadingMessages, sendMessage } = useMessages(selectedConversationId);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sending, setSending] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+  const [showNewMessageIndicator, setShowNewMessageIndicator] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLength = useRef(messages.length);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
+  // Play notification sound for new messages
+  const playNotificationSound = useCallback(() => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (e) {
+      console.log('Audio notification not available');
+    }
+  }, []);
+
+  // Check for new messages and play sound
   useEffect(() => {
+    if (messages.length > prevMessagesLength.current) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage && lastMessage.sender_id !== currentUserId) {
+        playNotificationSound();
+        setShowNewMessageIndicator(true);
+        setTimeout(() => setShowNewMessageIndicator(false), 3000);
+      }
+    }
+    prevMessagesLength.current = messages.length;
     scrollToBottom();
-  }, [messages]);
+  }, [messages, currentUserId, playNotificationSound, scrollToBottom]);
+
+  // Monitor realtime connection status
+  useEffect(() => {
+    const channel = supabase.channel('connection-status');
+    
+    channel.subscribe((status) => {
+      setIsConnected(status === 'SUBSCRIBED');
+    });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || sending) return;
@@ -95,6 +145,14 @@ export const ChatSystem = () => {
 
   return (
     <div className="flex h-[600px] rounded-lg border bg-card overflow-hidden">
+      {/* Connection Status */}
+      {!isConnected && (
+        <div className="absolute top-0 left-0 right-0 bg-destructive text-destructive-foreground text-xs py-1 px-2 flex items-center justify-center gap-1 z-10">
+          <WifiOff className="h-3 w-3" />
+          Reconectando...
+        </div>
+      )}
+      
       {/* Conversations List */}
       <div className="w-1/3 border-r flex flex-col">
         <div className="p-4 border-b">
