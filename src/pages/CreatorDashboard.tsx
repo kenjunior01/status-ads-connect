@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressCTA } from "@/components/EnhancedCTA";
 import { TrustIndicators } from "@/components/TrustIndicators";
@@ -9,8 +8,9 @@ import { MetricsCard } from "@/components/MetricsCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { EarningsChart } from "@/components/EarningsChart";
-import { ChatButton } from "@/components/ChatSystem";
 import { NotificationButton } from "@/components/NotificationsPanel";
+import { useProfile } from "@/hooks/useProfile";
+import { useCampaigns } from "@/hooks/useCampaigns";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -18,28 +18,38 @@ import {
   Eye,
   Settings,
   Award,
-  Target
+  Target,
+  Loader2
 } from "lucide-react";
 
 export const CreatorDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { profile, loading: profileLoading } = useProfile();
+  const { campaigns, loading: campaignsLoading } = useCampaigns();
 
-  const stats = {
-    totalEarnings: 2847.50,
-    monthlyEarnings: 642.30,
-    activeCampaigns: 3,
-    completedCampaigns: 18,
-    avgRating: 4.8,
-    totalReviews: 24,
-    responseRate: 96,
-    profileViews: 1247
-  };
+  const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
+  const completedCampaigns = campaigns.filter(c => c.status === 'completed');
+  
+  const totalEarnings = completedCampaigns.reduce((sum, c) => sum + Number(c.price), 0);
+  const monthlyEarnings = completedCampaigns
+    .filter(c => {
+      const completedDate = c.completed_at ? new Date(c.completed_at) : null;
+      if (!completedDate) return false;
+      const now = new Date();
+      return completedDate.getMonth() === now.getMonth() && completedDate.getFullYear() === now.getFullYear();
+    })
+    .reduce((sum, c) => sum + Number(c.price), 0);
 
-  const campaigns = [
-    { id: 1, title: "Produto de Beleza Natural", advertiser: "BeautyBrand", price: 150, status: "active" as const, deadline: "2025-01-15", progress: 60 },
-    { id: 2, title: "App de Fitness", advertiser: "FitApp", price: 200, status: "pending" as const, deadline: "2025-01-20", progress: 0 },
-    { id: 3, title: "Curso Online", advertiser: "EduTech", price: 120, status: "completed" as const, deadline: "2024-12-30", progress: 100 }
-  ];
+  if (profileLoading || campaignsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Carregando seu painel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
@@ -47,7 +57,7 @@ export const CreatorDashboard = () => {
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Painel do Criador</h1>
-            <p className="text-muted-foreground mt-1">Gerencie suas campanhas e monitore seus ganhos</p>
+            <p className="text-muted-foreground mt-1">Olá, {profile?.display_name || 'Criador'}! Gerencie suas campanhas e monitore seus ganhos</p>
           </div>
           <div className="flex gap-2">
             <NotificationButton />
@@ -56,10 +66,10 @@ export const CreatorDashboard = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricsCard title="Total Ganho" value={`R$ ${stats.totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" trend={{ value: 12.5, isPositive: true }} />
-          <MetricsCard title="Este Mês" value={`R$ ${stats.monthlyEarnings.toFixed(2)}`} icon={TrendingUp} variant="primary" trend={{ value: 8.3, isPositive: true }} />
-          <MetricsCard title="Campanhas Ativas" value={stats.activeCampaigns} icon={Target} variant="warning" subtitle="Em andamento" />
-          <MetricsCard title="Avaliação Média" value={stats.avgRating} icon={Star} variant="default" subtitle={`${stats.totalReviews} avaliações`} />
+          <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" trend={{ value: 12.5, isPositive: true }} />
+          <MetricsCard title="Este Mês" value={`R$ ${monthlyEarnings.toFixed(2)}`} icon={TrendingUp} variant="primary" trend={{ value: 8.3, isPositive: true }} />
+          <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="warning" subtitle="Em andamento" />
+          <MetricsCard title="Avaliação Média" value={profile?.rating || 0} icon={Star} variant="default" subtitle={`${profile?.total_reviews || 0} avaliações`} />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -75,14 +85,14 @@ export const CreatorDashboard = () => {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Award className="h-5 w-5" />Performance</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center"><span className="text-sm">Taxa de Resposta</span><span className="font-semibold text-success">{stats.responseRate}%</span></div>
-                  <div className="flex justify-between items-center"><span className="text-sm">Campanhas Concluídas</span><span className="font-semibold">{stats.completedCampaigns}</span></div>
-                  <div className="flex justify-between items-center"><span className="text-sm">Visualizações do Perfil</span><span className="font-semibold">{stats.profileViews}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-sm">Taxa de Resposta</span><span className="font-semibold text-success">96%</span></div>
+                  <div className="flex justify-between items-center"><span className="text-sm">Campanhas Concluídas</span><span className="font-semibold">{completedCampaigns.length}</span></div>
+                  <div className="flex justify-between items-center"><span className="text-sm">Visualizações do Perfil</span><span className="font-semibold">{profile?.total_campaigns || 0}</span></div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader><CardTitle>Próximos Passos</CardTitle></CardHeader>
-                <CardContent><ProgressCTA currentStep={2} totalSteps={5} nextAction="Completar Perfil" onClick={() => setActiveTab("profile")} /></CardContent>
+                <CardContent><ProgressCTA currentStep={profile?.bio ? 3 : 2} totalSteps={5} nextAction="Completar Perfil" onClick={() => setActiveTab("profile")} /></CardContent>
               </Card>
             </div>
             <TrustIndicators />
@@ -93,11 +103,31 @@ export const CreatorDashboard = () => {
               <h2 className="text-xl font-semibold">Suas Campanhas</h2>
               <Button><Eye className="h-4 w-4 mr-2" />Ver Disponíveis</Button>
             </div>
-            <div className="grid gap-4">
-              {campaigns.map((campaign) => (
-                <CampaignCard key={campaign.id} campaign={{ ...campaign, advertiser: campaign.advertiser, id: campaign.id.toString() }} viewType="creator" onViewDetails={() => {}} onOpenChat={() => {}} />
-              ))}
-            </div>
+            {campaigns.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">Você ainda não tem campanhas. Aguarde propostas de anunciantes!</p>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {campaigns.map((campaign) => (
+                  <CampaignCard 
+                    key={campaign.id} 
+                    campaign={{ 
+                      id: campaign.id, 
+                      title: campaign.title, 
+                      advertiser: "Anunciante", 
+                      price: Number(campaign.price), 
+                      status: campaign.status as 'active' | 'pending' | 'completed',
+                      deadline: campaign.created_at || '',
+                      progress: campaign.status === 'completed' ? 100 : campaign.status === 'active' ? 50 : 0
+                    }} 
+                    viewType="creator" 
+                    onViewDetails={() => {}} 
+                    onOpenChat={() => {}} 
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="earnings"><EarningsChart /></TabsContent>
