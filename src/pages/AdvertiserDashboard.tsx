@@ -11,26 +11,37 @@ import { SearchFilters } from "@/components/SearchFilters";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { CreateCampaignDialog } from "@/components/CreateCampaignForm";
 import { NotificationButton } from "@/components/NotificationsPanel";
-import { Plus, Target, TrendingUp, Eye, Settings, DollarSign } from "lucide-react";
+import { useCampaigns } from "@/hooks/useCampaigns";
+import { useProfiles } from "@/hooks/useProfiles";
+import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2 } from "lucide-react";
 
 export const AdvertiserDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const { campaigns, loading: campaignsLoading } = useCampaigns();
+  const { profiles, loading: profilesLoading } = useProfiles();
 
-  const stats = { activeCampaigns: 5, totalSpent: 12750.00, avgEngagement: 4.2, totalReach: 45600 };
-
-  const campaigns = [
-    { id: 1, title: "Produto de Beleza Natural", creator: "@beleza_maria", budget: 500, spent: 300, status: "active" as const, reach: 12500, engagement: 4.8, deadline: "2025-01-15", progress: 60 },
-    { id: 2, title: "App de Fitness", creator: "@fit_coach_ana", budget: 800, spent: 0, status: "pending" as const, reach: 0, engagement: 0, deadline: "2025-01-20", progress: 0 }
-  ];
-
-  const topCreators = [
-    { id: "1", display_name: "Maria Beauty", niche: "Beleza", price_range: "Mid-range", rating: 4.9, total_reviews: 24, total_campaigns: 18, is_verified: true, badge_level: "gold", created_at: "2024-01-15T00:00:00Z" },
-    { id: "2", display_name: "Fitness Ana", niche: "Fitness", price_range: "Premium", rating: 4.7, total_reviews: 19, total_campaigns: 22, is_verified: true, badge_level: "platinum", created_at: "2024-02-20T00:00:00Z" }
-  ];
+  const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
+  const totalSpent = campaigns.filter(c => c.status === 'completed').reduce((sum, c) => sum + Number(c.price), 0);
 
   const getStatusColor = (status: string) => {
-    switch (status) { case 'active': return 'bg-success'; case 'pending': return 'bg-warning'; case 'completed': return 'bg-primary'; default: return 'bg-muted'; }
+    switch (status) { 
+      case 'active': return 'bg-success'; 
+      case 'pending': return 'bg-warning'; 
+      case 'completed': return 'bg-primary'; 
+      default: return 'bg-muted'; 
+    }
   };
+
+  if (campaignsLoading || profilesLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Carregando seu painel...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
@@ -48,10 +59,10 @@ export const AdvertiserDashboard = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricsCard title="Campanhas Ativas" value={stats.activeCampaigns} icon={Target} variant="primary" trend={{ value: 25, isPositive: true }} />
-          <MetricsCard title="Total Investido" value={`R$ ${stats.totalSpent.toFixed(0)}`} icon={DollarSign} variant="success" trend={{ value: 15.2, isPositive: true }} />
-          <MetricsCard title="Alcance Total" value={stats.totalReach} icon={Eye} variant="warning" subtitle="pessoas impactadas" />
-          <MetricsCard title="Engajamento Médio" value={`${stats.avgEngagement}%`} icon={TrendingUp} variant="default" trend={{ value: 2.1, isPositive: true }} />
+          <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="primary" trend={{ value: 25, isPositive: true }} />
+          <MetricsCard title="Total Investido" value={`R$ ${totalSpent.toFixed(0)}`} icon={DollarSign} variant="success" trend={{ value: 15.2, isPositive: true }} />
+          <MetricsCard title="Criadores Disponíveis" value={profiles.length} icon={Eye} variant="warning" subtitle="na plataforma" />
+          <MetricsCard title="Campanhas Totais" value={campaigns.length} icon={TrendingUp} variant="default" />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -67,12 +78,16 @@ export const AdvertiserDashboard = () => {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Target className="h-5 w-5" />Campanhas Recentes</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  {campaigns.slice(0, 3).map((campaign) => (
-                    <div key={campaign.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                      <div><div className="font-medium">{campaign.title}</div><div className="text-sm text-muted-foreground">{campaign.creator}</div></div>
-                      <Badge className={getStatusColor(campaign.status)}>{campaign.status === 'active' ? 'Ativa' : 'Pendente'}</Badge>
-                    </div>
-                  ))}
+                  {campaigns.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-4">Nenhuma campanha ainda</p>
+                  ) : (
+                    campaigns.slice(0, 3).map((campaign) => (
+                      <div key={campaign.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                        <div><div className="font-medium">{campaign.title}</div><div className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</div></div>
+                        <Badge className={getStatusColor(campaign.status || 'pending')}>{campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}</Badge>
+                      </div>
+                    ))
+                  )}
                 </CardContent>
               </Card>
               <Card><CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5" />Top Performers</CardTitle></CardHeader><CardContent><TrustIndicators /></CardContent></Card>
@@ -84,17 +99,66 @@ export const AdvertiserDashboard = () => {
               <h2 className="text-xl font-semibold">Suas Campanhas</h2>
               <CreateCampaignDialog><Button><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button></CreateCampaignDialog>
             </div>
-            <div className="grid gap-4">
-              {campaigns.map((campaign) => (<CampaignCard key={campaign.id} campaign={{ ...campaign, creator: campaign.creator, id: campaign.id.toString() }} viewType="advertiser" onViewDetails={() => {}} onOpenChat={() => {}} onViewAnalytics={() => {}} />))}
-            </div>
+            {campaigns.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">Você ainda não tem campanhas. Crie sua primeira campanha!</p>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {campaigns.map((campaign) => (
+                  <CampaignCard 
+                    key={campaign.id} 
+                    campaign={{ 
+                      id: campaign.id, 
+                      title: campaign.title, 
+                      creator: "Criador", 
+                      budget: Number(campaign.price),
+                      spent: campaign.status === 'completed' ? Number(campaign.price) : 0,
+                      status: campaign.status as 'active' | 'pending' | 'completed',
+                      reach: 0,
+                      engagement: 0,
+                      deadline: campaign.created_at || '',
+                      progress: campaign.status === 'completed' ? 100 : campaign.status === 'active' ? 50 : 0
+                    }} 
+                    viewType="advertiser" 
+                    onViewDetails={() => {}} 
+                    onOpenChat={() => {}} 
+                    onViewAnalytics={() => {}}
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="creators" className="space-y-6">
             <h2 className="text-xl font-semibold">Encontrar Criadores</h2>
             <SearchFilters onFiltersChange={() => {}} showPriceFilter showNicheFilter showRatingFilter showLocationFilter />
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {topCreators.map((creator) => (<EnhancedProfileCard key={creator.id} profile={creator} onSelect={() => {}} />))}
-            </div>
+            {profiles.length === 0 ? (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground">Nenhum criador disponível no momento.</p>
+              </Card>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {profiles.map((creator) => (
+                  <EnhancedProfileCard 
+                    key={creator.id} 
+                    profile={{
+                      id: creator.id,
+                      display_name: creator.display_name,
+                      niche: creator.niche || '',
+                      price_range: creator.price_range || '',
+                      rating: Number(creator.rating) || 0,
+                      total_reviews: creator.total_reviews || 0,
+                      total_campaigns: creator.total_campaigns || 0,
+                      is_verified: creator.is_verified || false,
+                      badge_level: creator.badge_level || 'bronze',
+                      created_at: creator.created_at || ''
+                    }} 
+                    onSelect={() => {}} 
+                  />
+                ))}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
