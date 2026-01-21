@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useConversations, useMessages } from "@/hooks/useConversations";
 import { supabase } from "@/integrations/supabase/client";
+import { ImagePreview } from "@/components/ImagePreview";
 import { 
   Send, 
   MessageSquare, 
@@ -38,11 +39,26 @@ export const ChatSystem = () => {
   const [pendingAttachment, setPendingAttachment] = useState<{ url: string; type: string; name: string } | null>(null);
   const [isTyping, setIsTyping] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessagesLength = useRef(messages.length);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  // Collect all images from messages for gallery navigation
+  const chatImages = useMemo(() => {
+    return messages
+      .filter(m => m.attachment_url && m.attachment_type?.startsWith('image/'))
+      .map(m => ({ url: m.attachment_url!, name: m.attachment_name || undefined }));
+  }, [messages]);
+
+  const handleImageClick = useCallback((imageUrl: string) => {
+    const index = chatImages.findIndex(img => img.url === imageUrl);
+    setSelectedImageIndex(index >= 0 ? index : 0);
+    setImagePreviewOpen(true);
+  }, [chatImages]);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
@@ -209,6 +225,13 @@ export const ChatSystem = () => {
   }
 
   return (
+    <>
+    <ImagePreview 
+      images={chatImages}
+      initialIndex={selectedImageIndex}
+      open={imagePreviewOpen}
+      onOpenChange={setImagePreviewOpen}
+    />
     <div className="flex h-[600px] rounded-lg border bg-card overflow-hidden">
       {/* Connection Status */}
       {!isConnected && (
@@ -345,13 +368,16 @@ export const ChatSystem = () => {
                         {message.attachment_url && (
                           <div className="mb-2">
                             {message.attachment_type?.startsWith('image/') ? (
-                              <a href={message.attachment_url} target="_blank" rel="noopener noreferrer">
+                              <button
+                                onClick={() => handleImageClick(message.attachment_url!)}
+                                className="block cursor-zoom-in transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+                              >
                                 <img 
                                   src={message.attachment_url} 
                                   alt={message.attachment_name || 'Imagem'} 
                                   className="max-w-full rounded-lg max-h-48 object-cover"
                                 />
-                              </a>
+                              </button>
                             ) : (
                               <a 
                                 href={message.attachment_url} 
@@ -485,6 +511,7 @@ export const ChatSystem = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
