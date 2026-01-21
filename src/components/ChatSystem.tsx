@@ -36,15 +36,82 @@ export const ChatSystem = () => {
   const [isConnected, setIsConnected] = useState(true);
   const [showNewMessageIndicator, setShowNewMessageIndicator] = useState(false);
   const [pendingAttachment, setPendingAttachment] = useState<{ url: string; type: string; name: string } | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [otherUserTyping, setOtherUserTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessagesLength = useRef(messages.length);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const presenceChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
+
+  // Presence channel for typing indicator
+  useEffect(() => {
+    if (!selectedConversationId || !currentUserId) return;
+
+    const channel = supabase.channel(`presence-${selectedConversationId}`, {
+      config: {
+        presence: {
+          key: currentUserId,
+        },
+      },
+    });
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const otherUsers = Object.entries(state).filter(([key]) => key !== currentUserId);
+        const isOtherTyping = otherUsers.some(([_, presences]) => 
+          (presences as any[]).some(p => p.typing === true)
+        );
+        setOtherUserTyping(isOtherTyping);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({ typing: false, online_at: new Date().toISOString() });
+        }
+      });
+
+    presenceChannelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+      presenceChannelRef.current = null;
+    };
+  }, [selectedConversationId, currentUserId]);
+
+  // Handle typing indicator
+  const handleTyping = useCallback(() => {
+    if (!presenceChannelRef.current) return;
+
+    // Track typing state
+    presenceChannelRef.current.track({ typing: true, online_at: new Date().toISOString() });
+
+    // Clear previous timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set timeout to stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      if (presenceChannelRef.current) {
+        presenceChannelRef.current.track({ typing: false, online_at: new Date().toISOString() });
+      }
+    }, 2000);
+  }, []);
+
+  // Update typing state when input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMessage(e.target.value);
+    if (e.target.value.trim()) {
+      handleTyping();
+    }
+  };
 
   // Handle file selection
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,6 +385,23 @@ export const ChatSystem = () => {
                       </div>
                     </div>
                   ))}
+                  
+                  {/* Typing Indicator */}
+                  {otherUserTyping && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-2">
+                        <div className="flex items-center gap-1">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                            <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                            <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                          </div>
+                          <span className="text-xs text-muted-foreground ml-2">digitando...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div ref={messagesEndRef} />
                 </div>
               )}
@@ -370,7 +454,7 @@ export const ChatSystem = () => {
                 <Input
                   placeholder="Digite sua mensagem..."
                   value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   className="flex-1"
                   disabled={sending || uploading}
