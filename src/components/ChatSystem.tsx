@@ -15,20 +15,29 @@ import {
   Check,
   CheckCheck,
   Loader2,
-  Wifi,
-  WifiOff
+  WifiOff,
+  Paperclip,
+  Image as ImageIcon,
+  FileText,
+  X,
+  Download
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export const ChatSystem = () => {
+  const { toast } = useToast();
   const { conversations, loading: loadingConversations, currentUserId, refetch: refetchConversations } = useConversations();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
-  const { messages, loading: loadingMessages, sendMessage } = useMessages(selectedConversationId);
+  const { messages, loading: loadingMessages, sendMessage, uploadAttachment } = useMessages(selectedConversationId);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [showNewMessageIndicator, setShowNewMessageIndicator] = useState(false);
+  const [pendingAttachment, setPendingAttachment] = useState<{ url: string; type: string; name: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const prevMessagesLength = useRef(messages.length);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
@@ -37,65 +46,54 @@ export const ChatSystem = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  // Play notification sound for new messages
-  const playNotificationSound = useCallback(() => {
-    try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.3);
-    } catch (e) {
-      console.log('Audio notification not available');
-    }
-  }, []);
+  // Handle file selection
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  // Check for new messages and play sound
-  useEffect(() => {
-    if (messages.length > prevMessagesLength.current) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage && lastMessage.sender_id !== currentUserId) {
-        playNotificationSound();
-        setShowNewMessageIndicator(true);
-        setTimeout(() => setShowNewMessageIndicator(false), 3000);
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "Arquivo muito grande",
+        description: "O tamanho máximo permitido é 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const attachment = await uploadAttachment(file);
+      setPendingAttachment(attachment);
+      toast({
+        title: "Arquivo pronto",
+        description: "Clique em enviar para compartilhar o arquivo.",
+      });
+    } catch (err) {
+      console.error('Upload error:', err);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
     }
-    prevMessagesLength.current = messages.length;
-    scrollToBottom();
-  }, [messages, currentUserId, playNotificationSound, scrollToBottom]);
-
-  // Monitor realtime connection status
-  useEffect(() => {
-    const channel = supabase.channel('connection-status');
-    
-    channel.subscribe((status) => {
-      setIsConnected(status === 'SUBSCRIBED');
-    });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim() && !pendingAttachment) || sending) return;
 
     setSending(true);
     try {
-      await sendMessage(newMessage);
+      await sendMessage(newMessage, pendingAttachment || undefined);
       setNewMessage("");
+      setPendingAttachment(null);
     } finally {
       setSending(false);
     }
+  };
+
+  const removePendingAttachment = () => {
+    setPendingAttachment(null);
   };
 
   const formatTime = (dateStr: string) => {
@@ -276,7 +274,41 @@ export const ChatSystem = () => {
                             : 'bg-muted rounded-bl-md'
                         }`}
                       >
-                        <p className="text-sm">{message.content}</p>
+                        {/* Attachment Preview */}
+                        {message.attachment_url && (
+                          <div className="mb-2">
+                            {message.attachment_type?.startsWith('image/') ? (
+                              <a href={message.attachment_url} target="_blank" rel="noopener noreferrer">
+                                <img 
+                                  src={message.attachment_url} 
+                                  alt={message.attachment_name || 'Imagem'} 
+                                  className="max-w-full rounded-lg max-h-48 object-cover"
+                                />
+                              </a>
+                            ) : (
+                              <a 
+                                href={message.attachment_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={`flex items-center gap-2 p-2 rounded-lg ${
+                                  message.sender_id === currentUserId 
+                                    ? 'bg-primary-foreground/10' 
+                                    : 'bg-background/50'
+                                }`}
+                              >
+                                <FileText className="h-5 w-5" />
+                                <span className="text-sm truncate max-w-[150px]">
+                                  {message.attachment_name || 'Arquivo'}
+                                </span>
+                                <Download className="h-4 w-4 ml-auto" />
+                              </a>
+                            )}
+                          </div>
+                        )}
+                        
+                        {message.content && !message.content.startsWith('📎') && (
+                          <p className="text-sm">{message.content}</p>
+                        )}
                         <div className={`flex items-center justify-end gap-1 mt-1 ${
                           message.sender_id === currentUserId ? 'text-primary-foreground/70' : 'text-muted-foreground'
                         }`}>
@@ -292,17 +324,61 @@ export const ChatSystem = () => {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="p-4 border-t">
+            <div className="p-4 border-t space-y-2">
+              {/* Pending Attachment Preview */}
+              {pendingAttachment && (
+                <div className="flex items-center gap-2 p-2 bg-muted rounded-lg">
+                  {pendingAttachment.type.startsWith('image/') ? (
+                    <ImageIcon className="h-4 w-4 text-primary" />
+                  ) : (
+                    <FileText className="h-4 w-4 text-primary" />
+                  )}
+                  <span className="text-sm truncate flex-1">{pendingAttachment.name}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6"
+                    onClick={removePendingAttachment}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              
               <div className="flex items-center gap-2">
+                {/* File Upload Button */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  accept="image/*,.pdf,.doc,.docx,.txt"
+                  className="hidden"
+                />
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading || sending}
+                >
+                  {uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Paperclip className="h-4 w-4" />
+                  )}
+                </Button>
+                
                 <Input
                   placeholder="Digite sua mensagem..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   className="flex-1"
-                  disabled={sending}
+                  disabled={sending || uploading}
                 />
-                <Button onClick={handleSendMessage} disabled={!newMessage.trim() || sending}>
+                <Button 
+                  onClick={handleSendMessage} 
+                  disabled={(!newMessage.trim() && !pendingAttachment) || sending || uploading}
+                >
                   {sending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
