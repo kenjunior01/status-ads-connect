@@ -30,6 +30,9 @@ interface Message {
   content: string;
   status: 'sent' | 'delivered' | 'read';
   created_at: string;
+  attachment_url?: string | null;
+  attachment_type?: string | null;
+  attachment_name?: string | null;
 }
 
 export const useConversations = () => {
@@ -242,8 +245,8 @@ export const useMessages = (conversationId: string | null) => {
     }
   };
 
-  const sendMessage = async (content: string) => {
-    if (!conversationId || !content.trim()) return;
+  const sendMessage = async (content: string, attachment?: { url: string; type: string; name: string }) => {
+    if (!conversationId || (!content.trim() && !attachment)) return;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -254,8 +257,11 @@ export const useMessages = (conversationId: string | null) => {
         .insert({
           conversation_id: conversationId,
           sender_id: user.id,
-          content: content.trim(),
+          content: content.trim() || (attachment ? `📎 ${attachment.name}` : ''),
           status: 'sent',
+          attachment_url: attachment?.url || null,
+          attachment_type: attachment?.type || null,
+          attachment_name: attachment?.name || null,
         })
         .select()
         .single();
@@ -265,6 +271,9 @@ export const useMessages = (conversationId: string | null) => {
       const typedMessage: Message = {
         ...data,
         status: data.status as 'sent' | 'delivered' | 'read',
+        attachment_url: data.attachment_url,
+        attachment_type: data.attachment_type,
+        attachment_name: data.attachment_name,
       };
       setMessages(prev => [...prev, typedMessage]);
       return typedMessage;
@@ -273,6 +282,46 @@ export const useMessages = (conversationId: string | null) => {
       toast({
         title: "Erro ao enviar",
         description: "Não foi possível enviar sua mensagem.",
+        variant: "destructive",
+      });
+      throw err;
+    }
+  };
+
+  const uploadAttachment = async (file: File) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${conversationId}/${Date.now()}.${fileExt}`;
+
+      const { data, error } = await supabase.storage
+        .from('chat-attachments')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('chat-attachments')
+        .getPublicUrl(data.path);
+
+      // For private buckets, we need to create a signed URL
+      const { data: signedData } = await supabase.storage
+        .from('chat-attachments')
+        .createSignedUrl(data.path, 60 * 60 * 24 * 7); // 7 days
+
+      return {
+        url: signedData?.signedUrl || urlData.publicUrl,
+        type: file.type,
+        name: file.name,
+        path: data.path,
+      };
+    } catch (err) {
+      console.error('Error uploading attachment:', err);
+      toast({
+        title: "Erro no upload",
+        description: "Não foi possível enviar o arquivo.",
         variant: "destructive",
       });
       throw err;
@@ -316,6 +365,7 @@ export const useMessages = (conversationId: string | null) => {
     messages,
     loading,
     sendMessage,
+    uploadAttachment,
     refetch: fetchMessages,
   };
 };
