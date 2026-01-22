@@ -39,19 +39,19 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
       description: "Página inicial da plataforma"
     },
     {
-      title: "Para Criadores",
+      title: "Sou Criador",
       icon: Star,
       page: "creator-dashboard", 
-      description: "Monetize seu conteúdo"
+      description: "Monetize seus status"
     },
     {
-      title: "Para Anunciantes",
+      title: "Sou Anunciante",
       icon: Target,
       page: "advertiser-dashboard",
-      description: "Encontre influenciadores"
+      description: "Anuncie com criadores"
     },
     {
-      title: "Explorar Criadores",
+      title: "Explorar",
       icon: Users,
       page: "creators",
       description: "Descubra talentos"
@@ -102,11 +102,6 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
                       >
                         <Icon className="h-4 w-4 mr-2" />
                         {item.title}
-                        {(item.page === "creator-dashboard" || item.page === "advertiser-dashboard") && (
-                          <Badge className="ml-2 text-xs bg-gradient-primary">
-                            Dashboard
-                          </Badge>
-                        )}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
                         <div className="p-4 w-64">

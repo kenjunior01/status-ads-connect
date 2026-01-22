@@ -15,6 +15,8 @@ const Index = ({ onNavigate }: IndexProps) => {
   const { toast } = useToast();
   const { profiles, loading, getFeaturedProfiles, getNewProfiles, getDiscoverProfiles } = useProfiles();
   const [showFloatingCTA, setShowFloatingCTA] = useState(false);
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const [showAllNew, setShowAllNew] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -133,7 +135,7 @@ const Index = ({ onNavigate }: IndexProps) => {
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {getFeaturedProfiles().slice(0, 24).map((profile) => (
+              {getFeaturedProfiles().slice(0, showAllFeatured ? 24 : 6).map((profile) => (
                 <EnhancedProfileCard 
                   key={profile.id} 
                   profile={profile} 
@@ -141,6 +143,19 @@ const Index = ({ onNavigate }: IndexProps) => {
                 />
               ))}
             </div>
+            {getFeaturedProfiles().length > 6 && !showAllFeatured && (
+              <div className="text-center mt-8">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => setShowAllFeatured(true)}
+                  className="gap-2"
+                >
+                  <Users className="h-4 w-4" />
+                  Ver Mais Criadores ({getFeaturedProfiles().length - 6} restantes)
+                </Button>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -165,7 +180,7 @@ const Index = ({ onNavigate }: IndexProps) => {
               <p className="text-muted-foreground">Descubra os mais novos criadores • Preços especiais de lançamento</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {getNewProfiles().map((profile) => (
+              {getNewProfiles().slice(0, showAllNew ? 12 : 6).map((profile) => (
                 <EnhancedProfileCard 
                   key={profile.id} 
                   profile={profile} 
@@ -173,6 +188,19 @@ const Index = ({ onNavigate }: IndexProps) => {
                 />
               ))}
             </div>
+            {getNewProfiles().length > 6 && !showAllNew && (
+              <div className="text-center mt-8">
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  onClick={() => setShowAllNew(true)}
+                  className="gap-2"
+                >
+                  <Users className="h-4 w-4" />
+                  Ver Mais Novos Talentos ({getNewProfiles().length - 6} restantes)
+                </Button>
+              </div>
+            )}
           </div>
         </section>
       )}
