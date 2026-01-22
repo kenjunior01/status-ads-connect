@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
@@ -16,9 +14,9 @@ import {
   Users, 
   Star,
   Menu,
-  X,
   LogIn,
-  UserPlus
+  UserPlus,
+  Search
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -36,7 +34,13 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
       title: "Início",
       icon: Home,
       page: "index",
-      description: "Página inicial da plataforma"
+      description: "Página inicial"
+    },
+    {
+      title: "Explorar",
+      icon: Search,
+      page: "creators",
+      description: "Encontre criadores"
     },
     {
       title: "Sou Criador",
@@ -49,12 +53,6 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
       icon: Target,
       page: "advertiser-dashboard",
       description: "Anuncie com criadores"
-    },
-    {
-      title: "Explorar",
-      icon: Users,
-      page: "creators",
-      description: "Descubra talentos"
     }
   ];
 
@@ -73,52 +71,36 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
             onClick={() => handleNavigation("index")}
           >
             <div className="bg-gradient-primary p-2 rounded-lg">
-              <LayoutDashboard className="h-6 w-6 text-primary-foreground" />
+              <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <div className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
+              <div className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
                 StatusAds
-              </div>
-              <div className="text-xs text-muted-foreground hidden sm:block">
-                Conectando marcas e criadores
               </div>
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <NavigationMenu>
-              <NavigationMenuList>
-                {menuItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <NavigationMenuItem key={item.page}>
-                      <NavigationMenuTrigger
-                        className={cn(
-                          "bg-transparent hover:bg-accent data-[state=open]:bg-accent",
-                          currentPage === item.page && "bg-accent"
-                        )}
-                        onClick={() => handleNavigation(item.page)}
-                      >
-                        <Icon className="h-4 w-4 mr-2" />
-                        {item.title}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <div className="p-4 w-64">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Icon className="h-5 w-5 text-primary" />
-                            <h4 className="font-medium">{item.title}</h4>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {item.description}
-                          </p>
-                        </div>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  );
-                })}
-              </NavigationMenuList>
-            </NavigationMenu>
+          {/* Desktop Navigation - Simplified */}
+          <div className="hidden md:flex items-center space-x-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentPage === item.page;
+              return (
+                <Button
+                  key={item.page}
+                  variant={isActive ? "secondary" : "ghost"}
+                  size="sm"
+                  className={cn(
+                    "gap-2",
+                    isActive && "bg-primary/10 text-primary"
+                  )}
+                  onClick={() => handleNavigation(item.page)}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.title}
+                </Button>
+              );
+            })}
           </div>
 
           {/* Auth Buttons */}
@@ -127,7 +109,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
               <LogIn className="h-4 w-4 mr-2" />
               Entrar
             </Button>
-            <Button size="sm" className="bg-gradient-primary hover:bg-gradient-primary/90" onClick={() => onNavigate('auth')}>
+            <Button size="sm" className="bg-gradient-primary hover:opacity-90" onClick={() => onNavigate('auth')}>
               <UserPlus className="h-4 w-4 mr-2" />
               Cadastrar
             </Button>
@@ -140,8 +122,8 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <div className="flex flex-col space-y-4 mt-8">
+            <SheetContent side="right" className="w-[280px]">
+              <div className="flex flex-col space-y-2 mt-8">
                 {menuItems.map((item) => {
                   const Icon = item.icon;
                   return (
