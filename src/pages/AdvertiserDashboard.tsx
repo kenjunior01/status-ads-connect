@@ -46,17 +46,40 @@ export const AdvertiserDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-start">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Painel do Anunciante</h1>
             <p className="text-muted-foreground mt-1">Gerencie campanhas e encontre os melhores criadores</p>
           </div>
-          <div className="flex gap-2">
-            <CreateCampaignDialog><Button><Plus className="h-4 w-4 mr-2" />Nova Campanha</Button></CreateCampaignDialog>
+          <div className="flex gap-2 flex-wrap">
+            <CreateCampaignDialog>
+              <Button size="lg" className="bg-gradient-primary hover:opacity-90 shadow-lg">
+                <Plus className="h-5 w-5 mr-2" />
+                Nova Campanha
+              </Button>
+            </CreateCampaignDialog>
             <NotificationButton />
             <Button variant="outline" size="sm"><Settings className="h-4 w-4 mr-2" />Configurações</Button>
           </div>
         </div>
+
+        {/* Prominent CTA for empty state */}
+        {campaigns.length === 0 && (
+          <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+            <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-semibold text-foreground">Comece sua primeira campanha!</h3>
+                <p className="text-muted-foreground">Conecte-se com criadores e alcance milhares de visualizações no WhatsApp Status</p>
+              </div>
+              <CreateCampaignDialog>
+                <Button size="lg" className="bg-gradient-primary hover:opacity-90 shadow-lg whitespace-nowrap">
+                  <Plus className="h-5 w-5 mr-2" />
+                  Criar Minha Primeira Campanha
+                </Button>
+              </CreateCampaignDialog>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="primary" trend={{ value: 25, isPositive: true }} />
