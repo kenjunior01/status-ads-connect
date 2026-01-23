@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Verified, MessageCircle, Eye, TrendingUp, Zap, Clock } from "lucide-react";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { useFavorites } from "@/hooks/useFavorites";
+import { Star, Verified, MessageCircle, Eye, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Profile {
@@ -21,6 +23,7 @@ interface PremiumCreatorCardProps {
   className?: string;
   onSelect?: (profile: Profile) => void;
   variant?: "default" | "featured" | "compact";
+  showFavoriteButton?: boolean;
 }
 
 const badgeConfig = {
@@ -48,8 +51,10 @@ export const PremiumCreatorCard = ({
   profile, 
   className, 
   onSelect,
-  variant = "default" 
+  variant = "default",
+  showFavoriteButton = false
 }: PremiumCreatorCardProps) => {
+  const { isFavorite, toggleFavorite } = useFavorites();
   const badge = badgeConfig[profile.badge_level as keyof typeof badgeConfig] || badgeConfig.bronze;
   const isNew = new Date().getTime() - new Date(profile.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
   const isTopRated = profile.rating >= 4.5 && profile.total_reviews >= 3;
@@ -57,6 +62,11 @@ export const PremiumCreatorCard = ({
   
   // Calculate response rate (mock - would come from real data)
   const responseRate = 85 + Math.floor(Math.random() * 15);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(profile);
+  };
 
   return (
     <Card 
@@ -69,6 +79,18 @@ export const PremiumCreatorCard = ({
       )}
       onClick={() => onSelect?.(profile)}
     >
+      {/* Favorite Button - Top Left */}
+      {showFavoriteButton && (
+        <div className="absolute top-3 left-3 z-20">
+          <FavoriteButton
+            isFavorite={isFavorite(profile.id)}
+            onClick={handleFavoriteClick}
+            size="sm"
+            variant="overlay"
+          />
+        </div>
+      )}
+
       {/* Status Badges - Top Right */}
       <div className="absolute top-3 right-3 z-10 flex flex-col gap-1.5">
         {isTopRated && (

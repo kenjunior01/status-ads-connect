@@ -3,10 +3,12 @@ import { Button } from "@/components/ui/button";
 import { HeroSearch } from "@/components/HeroSearch";
 import { PremiumCreatorCard } from "@/components/PremiumCreatorCard";
 import { CategoryTabs } from "@/components/CategoryTabs";
-import { SearchFilters } from "@/components/SearchFilters";
+import { AdvancedFiltersSidebar, MobileFiltersSheet, FilterState } from "@/components/AdvancedFiltersSidebar";
 import { TrustIndicators, SocialProof } from "@/components/TrustIndicators";
 import { EnhancedCTA, FloatingCTA } from "@/components/EnhancedCTA";
+import { CreatorProfile } from "@/pages/CreatorProfile";
 import { useProfiles } from "@/hooks/useProfiles";
+import { useFavorites } from "@/hooks/useFavorites";
 import { 
   Users, 
   MessageSquare, 
@@ -17,7 +19,8 @@ import {
   Award,
   Zap,
   ArrowRight,
-  ChevronDown
+  ChevronDown,
+  Heart
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,13 +28,27 @@ interface IndexProps {
   onNavigate?: (page: string) => void;
 }
 
+const defaultFilters: FilterState = {
+  priceRange: [0, 500],
+  niches: [],
+  minRating: 0,
+  minCampaigns: 0,
+  minResponseRate: 0,
+  onlineOnly: false,
+  verifiedOnly: false,
+  badgeLevels: []
+};
+
 const Index = ({ onNavigate }: IndexProps) => {
   const { toast } = useToast();
   const { profiles, loading, getFeaturedProfiles, getNewProfiles, getDiscoverProfiles } = useProfiles();
+  const { favorites, getFavoriteCount } = useFavorites();
   const [showFloatingCTA, setShowFloatingCTA] = useState(false);
   const [activeCategory, setActiveCategory] = useState("featured");
   const [showAllProfiles, setShowAllProfiles] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const [selectedProfile, setSelectedProfile] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,10 +60,7 @@ const Index = ({ onNavigate }: IndexProps) => {
   }, []);
 
   const handleProfileSelect = (profile: any) => {
-    toast({
-      title: "Perfil selecionado!",
-      description: `Você clicou no perfil de ${profile.display_name}`,
-    });
+    setSelectedProfile(profile);
   };
 
   const handleSearch = (query: string) => {
@@ -65,15 +79,85 @@ const Index = ({ onNavigate }: IndexProps) => {
     });
   };
 
+  const clearFilters = () => {
+    setFilters(defaultFilters);
+  };
+
+  // Apply filters to profiles
+  const applyFilters = (profilesList: any[]) => {
+    return profilesList.filter(profile => {
+      // Price filter
+      const price = parseInt(profile.price_range?.replace(/\D/g, '') || '50');
+      if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
+        return false;
+      }
+
+      // Rating filter
+      if (filters.minRating > 0 && profile.rating < filters.minRating) {
+        return false;
+      }
+
+      // Campaigns filter
+      if (filters.minCampaigns > 0 && profile.total_campaigns < filters.minCampaigns) {
+        return false;
+      }
+
+      // Verified filter
+      if (filters.verifiedOnly && !profile.is_verified) {
+        return false;
+      }
+
+      // Badge level filter
+      if (filters.badgeLevels.length > 0 && !filters.badgeLevels.includes(profile.badge_level)) {
+        return false;
+      }
+
+      // Niche filter
+      if (filters.niches.length > 0) {
+        const nicheMap: Record<string, string[]> = {
+          lifestyle: ["Lifestyle", "Viagem"],
+          fitness: ["Fitness & Saúde", "Fitness"],
+          tech: ["Tecnologia", "Tech"],
+          beauty: ["Beleza & Moda", "Beleza"],
+          food: ["Culinária", "Gastronomia"],
+          travel: ["Viagem", "Travel"],
+          gaming: ["Games", "Gaming"],
+          education: ["Educação", "Education"],
+          business: ["Negócios", "Business"],
+          design: ["Arte & Design", "Design"],
+        };
+        
+        const matchesNiche = filters.niches.some(niche => {
+          const niches = nicheMap[niche] || [];
+          return profile.niche && niches.some(n => 
+            profile.niche?.toLowerCase().includes(n.toLowerCase())
+          );
+        });
+        
+        if (!matchesNiche) return false;
+      }
+
+      return true;
+    });
+  };
+
   // Get profiles based on active category
   const getActiveProfiles = () => {
+    let baseProfiles: any[];
+    
     switch (activeCategory) {
       case "featured":
-        return getFeaturedProfiles();
+        baseProfiles = getFeaturedProfiles();
+        break;
       case "recent":
-        return getNewProfiles();
+        baseProfiles = getNewProfiles();
+        break;
       case "trending":
-        return [...profiles].sort((a, b) => b.total_campaigns - a.total_campaigns).slice(0, 24);
+        baseProfiles = [...profiles].sort((a, b) => b.total_campaigns - a.total_campaigns).slice(0, 24);
+        break;
+      case "favorites":
+        baseProfiles = profiles.filter(p => favorites.some(f => f.id === p.id));
+        break;
       default:
         // Filter by niche
         const nicheMap: Record<string, string[]> = {
@@ -89,14 +173,32 @@ const Index = ({ onNavigate }: IndexProps) => {
           design: ["Arte & Design", "Design"],
         };
         const niches = nicheMap[activeCategory] || [];
-        return profiles.filter(p => 
+        baseProfiles = profiles.filter(p => 
           p.niche && niches.some(n => p.niche?.toLowerCase().includes(n.toLowerCase()))
         );
     }
+
+    return applyFilters(baseProfiles);
   };
 
   const activeProfiles = getActiveProfiles();
   const displayProfiles = showAllProfiles ? activeProfiles : activeProfiles.slice(0, 8);
+
+  // Show Creator Profile if selected
+  if (selectedProfile) {
+    return (
+      <CreatorProfile 
+        profile={selectedProfile}
+        onBack={() => setSelectedProfile(null)}
+        onContact={() => {
+          toast({
+            title: "Iniciando conversa...",
+            description: `Abrindo chat com ${selectedProfile.display_name}`,
+          });
+        }}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -188,10 +290,10 @@ const Index = ({ onNavigate }: IndexProps) => {
         </div>
       </section>
 
-      {/* Main Listings Section */}
+      {/* Main Listings Section with Sidebar */}
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header with Filters */}
+          {/* Section Header */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
@@ -203,20 +305,35 @@ const Index = ({ onNavigate }: IndexProps) => {
                 </p>
               </div>
               
-              {/* Advanced Filters */}
-              <SearchFilters 
-                showPriceFilter={true}
-                showNicheFilter={false}
-                showRatingFilter={true}
-                showLocationFilter={false}
-                className="w-full md:w-auto"
-              />
+              {/* Mobile Filters */}
+              <div className="flex items-center gap-2">
+                <MobileFiltersSheet
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  onClearFilters={clearFilters}
+                >
+                  <span />
+                </MobileFiltersSheet>
+                
+                {/* Favorites Button */}
+                <Button
+                  variant={activeCategory === "favorites" ? "default" : "outline"}
+                  onClick={() => setActiveCategory("favorites")}
+                  className="gap-2"
+                >
+                  <Heart className="h-4 w-4" />
+                  Favoritos ({getFavoriteCount()})
+                </Button>
+              </div>
             </div>
 
             {/* Category Tabs */}
             <CategoryTabs 
               activeTab={activeCategory} 
-              onTabChange={setActiveCategory}
+              onTabChange={(tab) => {
+                setActiveCategory(tab);
+                setShowAllProfiles(false);
+              }}
               counts={{
                 featured: getFeaturedProfiles().length,
                 recent: getNewProfiles().length,
@@ -225,51 +342,77 @@ const Index = ({ onNavigate }: IndexProps) => {
             />
           </div>
 
-          {/* Profile Grid */}
-          {displayProfiles.length > 0 ? (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {displayProfiles.map((profile, index) => (
-                  <PremiumCreatorCard 
-                    key={profile.id} 
-                    profile={profile} 
-                    onSelect={handleProfileSelect}
-                    variant={index < 2 && activeCategory === "featured" ? "featured" : "default"}
-                  />
-                ))}
-              </div>
+          {/* Content Grid with Sidebar */}
+          <div className="flex gap-8">
+            {/* Desktop Sidebar */}
+            <AdvancedFiltersSidebar
+              filters={filters}
+              onFiltersChange={setFilters}
+              onClearFilters={clearFilters}
+            />
 
-              {/* Load More */}
-              {activeProfiles.length > 8 && !showAllProfiles && (
-                <div className="text-center mt-10">
-                  <Button 
-                    variant="outline" 
-                    size="lg"
-                    onClick={() => setShowAllProfiles(true)}
-                    className="gap-2 px-8"
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                    Ver Mais ({activeProfiles.length - 8} criadores)
+            {/* Profile Grid */}
+            <div className="flex-1">
+              {displayProfiles.length > 0 ? (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    {displayProfiles.map((profile, index) => (
+                      <PremiumCreatorCard 
+                        key={profile.id} 
+                        profile={profile} 
+                        onSelect={handleProfileSelect}
+                        variant={index < 2 && activeCategory === "featured" ? "featured" : "default"}
+                        showFavoriteButton
+                      />
+                    ))}
+                  </div>
+
+                  {/* Load More */}
+                  {activeProfiles.length > 8 && !showAllProfiles && (
+                    <div className="text-center mt-10">
+                      <Button 
+                        variant="outline" 
+                        size="lg"
+                        onClick={() => setShowAllProfiles(true)}
+                        className="gap-2 px-8"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                        Ver Mais ({activeProfiles.length - 8} criadores)
+                      </Button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                    {activeCategory === "favorites" ? (
+                      <Heart className="h-8 w-8 text-muted-foreground" />
+                    ) : (
+                      <Users className="h-8 w-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    {activeCategory === "favorites" 
+                      ? "Nenhum favorito ainda"
+                      : "Nenhum criador encontrado"
+                    }
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    {activeCategory === "favorites"
+                      ? "Adicione criadores aos seus favoritos clicando no ❤️"
+                      : "Tente ajustar os filtros ou explorar outras categorias"
+                    }
+                  </p>
+                  <Button variant="outline" onClick={() => {
+                    setActiveCategory("featured");
+                    clearFilters();
+                  }}>
+                    Ver Criadores em Destaque
                   </Button>
                 </div>
               )}
-            </>
-          ) : (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Nenhum criador encontrado
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Tente ajustar os filtros ou explorar outras categorias
-              </p>
-              <Button variant="outline" onClick={() => setActiveCategory("featured")}>
-                Ver Criadores em Destaque
-              </Button>
             </div>
-          )}
+          </div>
         </div>
       </section>
 
