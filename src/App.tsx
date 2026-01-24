@@ -10,6 +10,9 @@ import { CreatorDashboard } from "./pages/CreatorDashboard";
 import { AdvertiserDashboard } from "./pages/AdvertiserDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 
+// Initialize i18n
+import "@/lib/i18n";
+
 const queryClient = new QueryClient();
 
 function App() {
@@ -28,7 +31,7 @@ function App() {
       case "admin-dashboard":
         return <AdminDashboard />;
       case "creators":
-        return <Index onNavigate={setCurrentPage} />; // Placeholder - will show creators section
+        return <Index onNavigate={setCurrentPage} />;
       default:
         return <Index onNavigate={setCurrentPage} />;
     }

@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      campaign_proofs: {
+        Row: {
+          campaign_id: string
+          creator_id: string
+          engagement_data: Json | null
+          file_name: string | null
+          file_url: string
+          id: string
+          proof_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          status: string | null
+          submitted_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          campaign_id: string
+          creator_id: string
+          engagement_data?: Json | null
+          file_name?: string | null
+          file_url: string
+          id?: string
+          proof_type: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          campaign_id?: string
+          creator_id?: string
+          engagement_data?: Json | null
+          file_name?: string | null
+          file_url?: string
+          id?: string
+          proof_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_proofs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           advertiser_id: string
@@ -23,8 +79,11 @@ export type Database = {
           description: string | null
           id: string
           price: number
+          proof_deadline: string | null
+          proof_required: boolean | null
           status: string | null
           title: string
+          verification_status: string | null
         }
         Insert: {
           advertiser_id: string
@@ -34,8 +93,11 @@ export type Database = {
           description?: string | null
           id?: string
           price: number
+          proof_deadline?: string | null
+          proof_required?: boolean | null
           status?: string | null
           title: string
+          verification_status?: string | null
         }
         Update: {
           advertiser_id?: string
@@ -45,8 +107,11 @@ export type Database = {
           description?: string | null
           id?: string
           price?: number
+          proof_deadline?: string | null
+          proof_required?: boolean | null
           status?: string | null
           title?: string
+          verification_status?: string | null
         }
         Relationships: []
       }
@@ -137,6 +202,53 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          campaign_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          opened_by: string
+          reason: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          opened_by: string
+          reason: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          opened_by?: string
+          reason?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
             referencedColumns: ["id"]
           },
         ]
@@ -273,6 +385,35 @@ export type Database = {
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          profile_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          profile_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_favorites_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

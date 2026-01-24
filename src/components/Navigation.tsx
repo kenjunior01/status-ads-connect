@@ -1,17 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 import { 
   Home, 
   LayoutDashboard, 
   Target, 
-  Users, 
   Star,
   Menu,
   LogIn,
@@ -20,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface NavigationProps {
   onNavigate: (page: string) => void;
@@ -27,32 +21,33 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const menuItems = [
     {
-      title: "Início",
+      title: t('navigation.home'),
       icon: Home,
       page: "index",
-      description: "Página inicial"
+      description: t('navigation.home')
     },
     {
-      title: "Explorar",
+      title: t('navigation.explore'),
       icon: Search,
       page: "creators",
-      description: "Encontre criadores"
+      description: t('navigation.explore')
     },
     {
-      title: "Sou Criador",
+      title: t('navigation.creators'),
       icon: Star,
       page: "creator-dashboard", 
-      description: "Monetize seus status"
+      description: t('navigation.creators')
     },
     {
-      title: "Sou Anunciante",
+      title: t('navigation.advertisers'),
       icon: Target,
       page: "advertiser-dashboard",
-      description: "Anuncie com criadores"
+      description: t('navigation.advertisers')
     }
   ];
 
@@ -103,60 +98,61 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
             })}
           </div>
 
-          {/* Auth Buttons */}
+          {/* Auth Buttons & Language */}
           <div className="hidden md:flex items-center gap-2">
+            <LanguageSelector />
             <Button variant="ghost" size="sm" onClick={() => onNavigate('auth')}>
               <LogIn className="h-4 w-4 mr-2" />
-              Entrar
+              {t('navigation.login')}
             </Button>
             <Button size="sm" className="bg-gradient-primary hover:opacity-90" onClick={() => onNavigate('auth')}>
               <UserPlus className="h-4 w-4 mr-2" />
-              Cadastrar
+              {t('navigation.register')}
             </Button>
           </div>
 
           {/* Mobile Menu */}
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="sm">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
-              <div className="flex flex-col space-y-2 mt-8">
-                {menuItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Button
-                      key={item.page}
-                      variant={currentPage === item.page ? "default" : "ghost"}
-                      className="justify-start h-12"
-                      onClick={() => handleNavigation(item.page)}
-                    >
-                      <Icon className="h-5 w-5 mr-3" />
-                      <div className="text-left">
-                        <div className="font-medium">{item.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {item.description}
+          <div className="flex md:hidden items-center gap-2">
+            <LanguageSelector />
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px]">
+                <div className="flex flex-col space-y-2 mt-8">
+                  {menuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <Button
+                        key={item.page}
+                        variant={currentPage === item.page ? "default" : "ghost"}
+                        className="justify-start h-12"
+                        onClick={() => handleNavigation(item.page)}
+                      >
+                        <Icon className="h-5 w-5 mr-3" />
+                        <div className="text-left">
+                          <div className="font-medium">{item.title}</div>
                         </div>
-                      </div>
+                      </Button>
+                    );
+                  })}
+                  
+                  <div className="pt-4 border-t space-y-2">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => handleNavigation('auth')}>
+                      <LogIn className="h-4 w-4 mr-2" />
+                      {t('navigation.login')}
                     </Button>
-                  );
-                })}
-                
-                <div className="pt-4 border-t space-y-2">
-                  <Button variant="outline" className="w-full justify-start" onClick={() => handleNavigation('auth')}>
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Entrar
-                  </Button>
-                  <Button className="w-full justify-start bg-gradient-primary" onClick={() => handleNavigation('auth')}>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Cadastrar
-                  </Button>
+                    <Button className="w-full justify-start bg-gradient-primary" onClick={() => handleNavigation('auth')}>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      {t('navigation.register')}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </nav>

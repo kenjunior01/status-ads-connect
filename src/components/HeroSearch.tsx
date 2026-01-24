@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,15 +10,16 @@ interface HeroSearchProps {
   onCategorySelect?: (category: string) => void;
 }
 
-const popularCategories = [
-  { label: "Lifestyle", icon: Sparkles },
-  { label: "Fitness", icon: TrendingUp },
-  { label: "Tech", icon: Zap },
-  { label: "Beleza", icon: Users },
-];
-
 export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const popularCategories = [
+    { label: t('niches.lifestyle'), icon: Sparkles, value: "lifestyle" },
+    { label: t('niches.fitness'), icon: TrendingUp, value: "fitness" },
+    { label: t('niches.tech'), icon: Zap, value: "tech" },
+    { label: t('niches.beauty'), icon: Users, value: "beauty" },
+  ];
 
   const handleSearch = () => {
     onSearch?.(searchQuery);
@@ -38,7 +40,7 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Encontre o criador ideal para sua campanha..."
+              placeholder={t('hero.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -51,20 +53,20 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
             className="m-2 px-8 bg-primary hover:bg-primary-hover text-primary-foreground rounded-xl"
           >
             <Search className="h-5 w-5 mr-2" />
-            Buscar
+            {t('common.search')}
           </Button>
         </div>
       </div>
 
       {/* Popular Categories */}
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <span className="text-sm text-muted-foreground">Populares:</span>
+        <span className="text-sm text-muted-foreground">{t('categories.trending')}:</span>
         {popularCategories.map((category) => (
           <Badge
-            key={category.label}
+            key={category.value}
             variant="secondary"
             className="px-4 py-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors flex items-center gap-2"
-            onClick={() => onCategorySelect?.(category.label)}
+            onClick={() => onCategorySelect?.(category.value)}
           >
             <category.icon className="h-3 w-3" />
             {category.label}
@@ -76,11 +78,11 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         <div className="flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full">
           <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-          <span className="text-sm font-medium">2.5k+ criadores online</span>
+          <span className="text-sm font-medium">2.5k+ {t('hero.stats.creators').toLowerCase()}</span>
         </div>
         <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
           <Zap className="h-4 w-4" />
-          <span className="text-sm font-medium">Resposta em menos de 1h</span>
+          <span className="text-sm font-medium">{t('creator.responseTime')} &lt; 1h</span>
         </div>
       </div>
     </div>
