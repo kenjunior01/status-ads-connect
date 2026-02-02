@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navigation } from "@/components/Navigation";
+import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import { CreatorDashboard } from "./pages/CreatorDashboard";
@@ -39,16 +40,18 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <div className="min-h-screen bg-background">
-          <Navigation onNavigate={setCurrentPage} currentPage={currentPage} />
-          <main>
-            {renderPage()}
-          </main>
-        </div>
-      </TooltipProvider>
+      <LocalizationProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <div className="min-h-screen bg-background">
+            <Navigation onNavigate={setCurrentPage} currentPage={currentPage} />
+            <main>
+              {renderPage()}
+            </main>
+          </div>
+        </TooltipProvider>
+      </LocalizationProvider>
     </QueryClientProvider>
   );
 }
