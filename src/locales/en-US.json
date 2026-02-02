@@ -278,5 +278,16 @@
     "privacy": "Privacy",
     "contact": "Contact",
     "help": "Help"
+  },
+  "localization": {
+    "selectCountry": "Select Country",
+    "selectCurrency": "Select Currency",
+    "selectRegion": "Select Region",
+    "regions": {
+      "south_america": "South America",
+      "north_america": "North America",
+      "europe": "Europe",
+      "africa": "Africa"
+    }
   }
 }

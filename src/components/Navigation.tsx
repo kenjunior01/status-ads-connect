@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { RegionCurrencySelector } from "@/components/RegionCurrencySelector";
 
 interface NavigationProps {
   onNavigate: (page: string) => void;
@@ -100,6 +101,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
 
           {/* Auth Buttons & Language */}
           <div className="hidden md:flex items-center gap-2">
+            <RegionCurrencySelector />
             <LanguageSelector />
             <Button variant="ghost" size="sm" onClick={() => onNavigate('auth')}>
               <LogIn className="h-4 w-4 mr-2" />
@@ -113,6 +115,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
 
           {/* Mobile Menu */}
           <div className="flex md:hidden items-center gap-2">
+            <RegionCurrencySelector />
             <LanguageSelector />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
