@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,12 +12,16 @@ import { SearchFilters } from "@/components/SearchFilters";
 import { AnalyticsDashboard } from "@/components/AnalyticsDashboard";
 import { CreateCampaignDialog } from "@/components/CreateCampaignForm";
 import { NotificationButton } from "@/components/NotificationsPanel";
+import { ProofReviewPanel } from "@/components/ProofReviewPanel";
+import { VerificationBadge } from "@/components/VerificationBadge";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
-import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2 } from "lucide-react";
+import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle } from "lucide-react";
 
 export const AdvertiserDashboard = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedCampaignForReview, setSelectedCampaignForReview] = useState<string | null>(null);
   const { campaigns, loading: campaignsLoading } = useCampaigns();
   const { profiles, loading: profilesLoading } = useProfiles();
 
@@ -89,9 +94,13 @@ export const AdvertiserDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
+            <TabsTrigger value="verification" className="flex items-center gap-1">
+              <CheckCircle className="h-4 w-4" />
+              Verificação
+            </TabsTrigger>
             <TabsTrigger value="creators">Criadores</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
@@ -129,27 +138,87 @@ export const AdvertiserDashboard = () => {
             ) : (
               <div className="grid gap-4">
                 {campaigns.map((campaign) => (
-                  <CampaignCard 
-                    key={campaign.id} 
-                    campaign={{ 
-                      id: campaign.id, 
-                      title: campaign.title, 
-                      creator: "Criador", 
-                      budget: Number(campaign.price),
-                      spent: campaign.status === 'completed' ? Number(campaign.price) : 0,
-                      status: campaign.status as 'active' | 'pending' | 'completed',
-                      reach: 0,
-                      engagement: 0,
-                      deadline: campaign.created_at || '',
-                      progress: campaign.status === 'completed' ? 100 : campaign.status === 'active' ? 50 : 0
-                    }} 
-                    viewType="advertiser" 
-                    onViewDetails={() => {}} 
-                    onOpenChat={() => {}} 
-                    onViewAnalytics={() => {}}
-                  />
+                  <Card key={campaign.id} className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold">{campaign.title}</h3>
+                          <VerificationBadge status={(campaign.verification_status as 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected') || 'not_started'} />
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{campaign.description}</p>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                          <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
+                            {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        {campaign.verification_status === 'proof_submitted' && (
+                          <Button 
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedCampaignForReview(campaign.id);
+                              setActiveTab('verification');
+                            }}
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Revisar Prova
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
                 ))}
               </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="verification" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Verificação de Publicações</h2>
+            </div>
+            
+            {selectedCampaignForReview ? (
+              <div className="space-y-4">
+                <Button variant="outline" onClick={() => setSelectedCampaignForReview(null)}>
+                  ← Voltar para lista
+                </Button>
+                <ProofReviewPanel 
+                  campaignId={selectedCampaignForReview} 
+                  isAdvertiser={true}
+                />
+              </div>
+            ) : (
+              <>
+                {campaigns.filter(c => c.verification_status === 'proof_submitted' || c.verification_status === 'under_review').length === 0 ? (
+                  <Card className="p-8 text-center">
+                    <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhuma prova pendente de verificação.</p>
+                    <p className="text-sm text-muted-foreground mt-2">Quando criadores enviarem comprovantes, eles aparecerão aqui.</p>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {campaigns
+                      .filter(c => c.verification_status === 'proof_submitted' || c.verification_status === 'under_review')
+                      .map((campaign) => (
+                        <Card key={campaign.id} className="p-4 cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setSelectedCampaignForReview(campaign.id)}>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-semibold">{campaign.title}</h3>
+                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <VerificationBadge status={(campaign.verification_status as 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected') || 'not_started'} />
+                              <Button size="sm">Revisar</Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </>
             )}
           </TabsContent>
 

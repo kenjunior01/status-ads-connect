@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProgressCTA } from "@/components/EnhancedCTA";
 import { TrustIndicators } from "@/components/TrustIndicators";
@@ -9,6 +11,8 @@ import { CampaignCard } from "@/components/CampaignCard";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { EarningsChart } from "@/components/EarningsChart";
 import { NotificationButton } from "@/components/NotificationsPanel";
+import { ProofUploadForm } from "@/components/ProofUploadForm";
+import { VerificationBadge } from "@/components/VerificationBadge";
 import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { 
@@ -19,11 +23,16 @@ import {
   Settings,
   Award,
   Target,
-  Loader2
+  Loader2,
+  Upload
 } from "lucide-react";
 
+type VerificationStatus = 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected';
+
 export const CreatorDashboard = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
+  const [selectedCampaignForProof, setSelectedCampaignForProof] = useState<string | null>(null);
   const { profile, loading: profileLoading } = useProfile();
   const { campaigns, loading: campaignsLoading } = useCampaigns();
 
@@ -100,9 +109,34 @@ export const CreatorDashboard = () => {
 
           <TabsContent value="campaigns" className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Suas Campanhas</h2>
+              <h2 className="text-xl font-semibold">{t('dashboard.campaigns')}</h2>
               <Button><Eye className="h-4 w-4 mr-2" />Ver Disponíveis</Button>
             </div>
+            
+            {selectedCampaignForProof && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Upload className="h-5 w-5" />
+                    Enviar Comprovante
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ProofUploadForm 
+                    campaignId={selectedCampaignForProof} 
+                    onSuccess={() => setSelectedCampaignForProof(null)}
+                  />
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => setSelectedCampaignForProof(null)}
+                  >
+                    Cancelar
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+            
             {campaigns.length === 0 ? (
               <Card className="p-8 text-center">
                 <p className="text-muted-foreground">Você ainda não tem campanhas. Aguarde propostas de anunciantes!</p>
@@ -110,21 +144,34 @@ export const CreatorDashboard = () => {
             ) : (
               <div className="grid gap-4">
                 {campaigns.map((campaign) => (
-                  <CampaignCard 
-                    key={campaign.id} 
-                    campaign={{ 
-                      id: campaign.id, 
-                      title: campaign.title, 
-                      advertiser: "Anunciante", 
-                      price: Number(campaign.price), 
-                      status: campaign.status as 'active' | 'pending' | 'completed',
-                      deadline: campaign.created_at || '',
-                      progress: campaign.status === 'completed' ? 100 : campaign.status === 'active' ? 50 : 0
-                    }} 
-                    viewType="creator" 
-                    onViewDetails={() => {}} 
-                    onOpenChat={() => {}} 
-                  />
+                  <Card key={campaign.id} className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="font-semibold">{campaign.title}</h3>
+                          <VerificationBadge status={(campaign.verification_status as VerificationStatus) || 'not_started'} />
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">{campaign.description}</p>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                          <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
+                            {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        {campaign.status === 'active' && campaign.verification_status !== 'verified' && (
+                          <Button 
+                            size="sm"
+                            onClick={() => setSelectedCampaignForProof(campaign.id)}
+                          >
+                            <Upload className="h-4 w-4 mr-2" />
+                            Enviar Prova
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
                 ))}
               </div>
             )}

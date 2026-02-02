@@ -12,6 +12,9 @@ interface Campaign {
   status: string | null;
   created_at: string | null;
   completed_at: string | null;
+  proof_required: boolean | null;
+  proof_deadline: string | null;
+  verification_status: string | null;
 }
 
 interface CreateCampaignData {
