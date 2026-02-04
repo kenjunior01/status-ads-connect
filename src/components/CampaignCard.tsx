@@ -2,12 +2,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { 
   Calendar, 
   MessageSquare, 
   BarChart3, 
   Eye,
-  DollarSign,
   TrendingUp,
   Clock
 } from "lucide-react";
@@ -68,13 +68,14 @@ export const CampaignCard = ({
   onViewAnalytics,
   className 
 }: CampaignCardProps) => {
+  const { format } = useLocalizationContext();
   const status = statusConfig[campaign.status];
   const isActive = campaign.status === "active";
   const partner = viewType === "creator" ? campaign.advertiser : campaign.creator;
 
   const formatCurrency = (value?: number) => {
-    if (!value) return "R$ 0,00";
-    return `R$ ${value.toFixed(2).replace(".", ",")}`;
+    if (!value) return format(0);
+    return format(value);
   };
 
   const formatDate = (dateString: string) => {
