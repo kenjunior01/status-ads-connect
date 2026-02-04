@@ -289,5 +289,86 @@
       "europe": "Europe",
       "africa": "Africa"
     }
+  },
+  "valueProposition": {
+    "badge": "Global Platform",
+    "title": "One Solution for Everyone",
+    "subtitle": "Whether you're a business seeking global reach or a creator wanting to monetize, StatusAds connects you to success.",
+    "trustedBy": "Trusted by thousands of businesses and creators in 180+ countries",
+    "business": {
+      "badge": "For Businesses",
+      "title": "Reach Billions of Users",
+      "description": "Connect your brand to engaged audiences through WhatsApp Status. Targeted campaigns with measurable results.",
+      "benefits": {
+        "globalReach": {
+          "title": "Global Reach",
+          "description": "Access 2+ billion WhatsApp users across 180+ countries"
+        },
+        "targetedAds": {
+          "title": "Precise Targeting",
+          "description": "Choose creators by niche, region, language, and demographics"
+        },
+        "analytics": {
+          "title": "Real-Time Analytics",
+          "description": "Track views, engagement, and ROI of your campaigns"
+        },
+        "verified": {
+          "title": "Verified Creators",
+          "description": "All creators undergo audience and quality verification"
+        }
+      },
+      "stats": {
+        "users": "WhatsApp Users",
+        "countries": "Countries",
+        "openRate": "Open Rate"
+      },
+      "cta": "Start Advertising"
+    },
+    "creator": {
+      "badge": "For Creators",
+      "title": "Monetize Your Status",
+      "description": "Turn your views into income. Whether you're an influencer or everyday person, your status has value.",
+      "benefits": {
+        "monetize": {
+          "title": "Earn from Your Reach",
+          "description": "Get paid for each campaign published on your status"
+        },
+        "flexible": {
+          "title": "Work on Your Schedule",
+          "description": "Accept campaigns when you want, no fixed commitment"
+        },
+        "payments": {
+          "title": "Guaranteed Payment",
+          "description": "Receive payment within 24h after campaign approval"
+        },
+        "growth": {
+          "title": "Grow on the Platform",
+          "description": "Level up and unlock higher-value campaigns"
+        }
+      },
+      "stats": {
+        "paid": "Paid to Creators",
+        "creators": "Active Creators",
+        "payout": "Fast Payout"
+      },
+      "cta": "Start Earning"
+    },
+    "trust": {
+      "securePayments": "Secure Payments",
+      "verifiedCreators": "Verified Creators",
+      "globalSupport": "24/7 Global Support",
+      "multiCurrency": "Multi-Currency"
+    }
+  },
+  "emptyState": {
+    "noCreators": "Be the first to explore!",
+    "noCreatorsDescription": "New creators are signing up every day. Check back soon or adjust your filters.",
+    "noResults": "No results found",
+    "noResultsDescription": "Try adjusting the filters or exploring other categories",
+    "tryAgain": "Clear Filters"
+  },
+  "global": {
+    "platform": "Global WhatsApp Status advertising platform",
+    "tagline": "Connecting brands and creators worldwide"
   }
 }
