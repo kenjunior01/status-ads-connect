@@ -1,26 +1,30 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { HeroSearch } from "@/components/HeroSearch";
 import { PremiumCreatorCard } from "@/components/PremiumCreatorCard";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { AdvancedFiltersSidebar, MobileFiltersSheet, FilterState } from "@/components/AdvancedFiltersSidebar";
-import { TrustIndicators, SocialProof } from "@/components/TrustIndicators";
-import { EnhancedCTA, FloatingCTA } from "@/components/EnhancedCTA";
+import { SocialProof } from "@/components/TrustIndicators";
+import { FloatingCTA } from "@/components/EnhancedCTA";
+import { ValuePropositionSection } from "@/components/ValuePropositionSection";
 import { CreatorProfile } from "@/pages/CreatorProfile";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { 
   Users, 
   MessageSquare, 
   DollarSign, 
   Star, 
-  TrendingUp, 
   Shield,
   Award,
   Zap,
+  Globe,
   ArrowRight,
   ChevronDown,
-  Heart
+  Heart,
+  Sparkles
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -40,7 +44,9 @@ const defaultFilters: FilterState = {
 };
 
 const Index = ({ onNavigate }: IndexProps) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
+  const { format } = useLocalizationContext();
   const { profiles, loading, getFeaturedProfiles, getNewProfiles, getDiscoverProfiles } = useProfiles();
   const { favorites, getFavoriteCount } = useFavorites();
   const [showFloatingCTA, setShowFloatingCTA] = useState(false);
@@ -226,19 +232,17 @@ const Index = ({ onNavigate }: IndexProps) => {
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full mb-6">
-            <Zap className="h-4 w-4" />
-            <span className="text-sm font-medium">A maior plataforma de anúncios no WhatsApp Status</span>
+            <Globe className="h-4 w-4" />
+            <span className="text-sm font-medium">{t('global.platform')}</span>
           </div>
           
           {/* Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-            Encontre o Criador Ideal
-            <br />
-            <span className="text-white/90">para sua Campanha</span>
+            {t('hero.title')}
           </h1>
           
           <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Conecte-se com milhares de criadores verificados e alcance seu público-alvo através do WhatsApp Status.
+            {t('hero.subtitle')}
           </p>
           
           {/* Search Component */}
@@ -246,17 +250,26 @@ const Index = ({ onNavigate }: IndexProps) => {
         </div>
       </section>
 
-      {/* Trust Stats Bar */}
+      {/* Trust Stats Bar - Global Stats */}
       <section className="py-6 px-4 bg-card border-b border-border">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary/10 rounded-lg">
+                <Globe className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-bold text-xl text-foreground">180+</p>
+                <p className="text-xs text-muted-foreground">{t('valueProposition.business.stats.countries')}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
                 <Users className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="font-bold text-xl text-foreground">5.2k+</p>
-                <p className="text-xs text-muted-foreground">Criadores Ativos</p>
+                <p className="font-bold text-xl text-foreground">10K+</p>
+                <p className="text-xs text-muted-foreground">{t('hero.stats.creators')}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -264,8 +277,8 @@ const Index = ({ onNavigate }: IndexProps) => {
                 <DollarSign className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="font-bold text-xl text-foreground">R$ 2.5M+</p>
-                <p className="text-xs text-muted-foreground">Pagos a Criadores</p>
+                <p className="font-bold text-xl text-foreground">{format(5000000)}</p>
+                <p className="text-xs text-muted-foreground">{t('hero.stats.paid')}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -274,7 +287,7 @@ const Index = ({ onNavigate }: IndexProps) => {
               </div>
               <div>
                 <p className="font-bold text-xl text-foreground">4.9★</p>
-                <p className="text-xs text-muted-foreground">Avaliação Média</p>
+                <p className="text-xs text-muted-foreground">{t('creator.rating')}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -283,7 +296,7 @@ const Index = ({ onNavigate }: IndexProps) => {
               </div>
               <div>
                 <p className="font-bold text-xl text-foreground">100%</p>
-                <p className="text-xs text-muted-foreground">Pagamento Seguro</p>
+                <p className="text-xs text-muted-foreground">{t('trust.securePayment')}</p>
               </div>
             </div>
           </div>
@@ -384,30 +397,31 @@ const Index = ({ onNavigate }: IndexProps) => {
                 </>
               ) : (
                 <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
                     {activeCategory === "favorites" ? (
-                      <Heart className="h-8 w-8 text-muted-foreground" />
+                      <Heart className="h-10 w-10 text-primary" />
                     ) : (
-                      <Users className="h-8 w-8 text-muted-foreground" />
+                      <Sparkles className="h-10 w-10 text-primary" />
                     )}
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">
+                  <h3 className="text-xl font-semibold text-foreground mb-3">
                     {activeCategory === "favorites" 
-                      ? "Nenhum favorito ainda"
-                      : "Nenhum criador encontrado"
+                      ? t('favorites.empty')
+                      : t('emptyState.noCreators')
                     }
                   </h3>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                     {activeCategory === "favorites"
-                      ? "Adicione criadores aos seus favoritos clicando no ❤️"
-                      : "Tente ajustar os filtros ou explorar outras categorias"
+                      ? t('favorites.addSome')
+                      : t('emptyState.noCreatorsDescription')
                     }
                   </p>
-                  <Button variant="outline" onClick={() => {
+                  <Button onClick={() => {
                     setActiveCategory("featured");
                     clearFilters();
-                  }}>
-                    Ver Criadores em Destaque
+                  }} className="gap-2">
+                    <ArrowRight className="h-4 w-4" />
+                    {t('emptyState.tryAgain')}
                   </Button>
                 </div>
               )}
@@ -423,20 +437,23 @@ const Index = ({ onNavigate }: IndexProps) => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Value Proposition Section - For Businesses & Individuals */}
+      <ValuePropositionSection onNavigate={onNavigate} />
+
+      {/* Final CTA Section */}
       <section className="py-20 px-4 bg-gradient-hero text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-            <Award className="h-4 w-4" />
-            <span className="text-sm">Junte-se a mais de 5.000 criadores</span>
+            <Globe className="h-4 w-4" />
+            <span className="text-sm">{t('valueProposition.trustedBy')}</span>
           </div>
           
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Comece a Monetizar Hoje
+            {t('valueProposition.creator.title')}
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            Transforme seus stories do WhatsApp em uma fonte de renda recorrente. É rápido, fácil e seguro.
+            {t('valueProposition.creator.description')}
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -445,16 +462,16 @@ const Index = ({ onNavigate }: IndexProps) => {
               className="bg-white text-primary hover:bg-white/90 gap-2 px-8"
               onClick={() => onNavigate?.('auth')}
             >
-              Criar Conta Grátis
+              {t('valueProposition.creator.cta')}
               <ArrowRight className="h-4 w-4" />
             </Button>
             <Button 
               size="lg" 
               variant="outline" 
               className="border-white/30 text-white hover:bg-white/10"
-              onClick={() => onNavigate?.('auth')}
+              onClick={() => onNavigate?.('advertiser-dashboard')}
             >
-              Sou Anunciante
+              {t('valueProposition.business.cta')}
             </Button>
           </div>
         </div>
@@ -467,47 +484,47 @@ const Index = ({ onNavigate }: IndexProps) => {
             <div>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="bg-primary p-2.5 rounded-xl">
-                  <MessageSquare className="h-5 w-5 text-white" />
+                  <Globe className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-lg font-bold">StatusAds</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                A plataforma líder em monetização de status do WhatsApp no Brasil.
+                {t('global.tagline')}
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-background">Plataforma</h4>
+              <h4 className="font-semibold mb-4 text-background">{t('footer.about')}</h4>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
-                <li className="hover:text-primary transition-colors cursor-pointer">Como Funciona</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Preços</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">FAQ</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.about')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.terms')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.privacy')}</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-background">Para Criadores</h4>
+              <h4 className="font-semibold mb-4 text-background">{t('navigation.creators')}</h4>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
-                <li className="hover:text-primary transition-colors cursor-pointer">Cadastre-se</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Central de Ajuda</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Dicas de Sucesso</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('auth.register')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.help')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.contact')}</li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4 text-background">Para Empresas</h4>
+              <h4 className="font-semibold mb-4 text-background">{t('navigation.advertisers')}</h4>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
-                <li className="hover:text-primary transition-colors cursor-pointer">Anuncie Conosco</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Suporte Empresarial</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">API</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('valueProposition.business.cta')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.help')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.contact')}</li>
               </ul>
             </div>
           </div>
           <div className="border-t border-muted mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              &copy; 2024 StatusAds. Todos os direitos reservados.
+              &copy; 2024 StatusAds. {t('global.platform')}
             </p>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <span className="hover:text-primary cursor-pointer">Termos</span>
-              <span className="hover:text-primary cursor-pointer">Privacidade</span>
-              <span className="hover:text-primary cursor-pointer">Cookies</span>
+              <span className="hover:text-primary cursor-pointer">{t('footer.terms')}</span>
+              <span className="hover:text-primary cursor-pointer">{t('footer.privacy')}</span>
+              <span className="hover:text-primary cursor-pointer">{t('footer.contact')}</span>
             </div>
           </div>
         </div>

@@ -289,5 +289,86 @@
       "europe": "Europa",
       "africa": "África"
     }
+  },
+  "valueProposition": {
+    "badge": "Plataforma Global",
+    "title": "Una Solución para Todos",
+    "subtitle": "Ya seas una empresa buscando alcance global o un creador que quiere monetizar, StatusAds te conecta con el éxito.",
+    "trustedBy": "Utilizado por miles de empresas y creadores en más de 180 países",
+    "business": {
+      "badge": "Para Empresas",
+      "title": "Alcanza Miles de Millones de Usuarios",
+      "description": "Conecta tu marca con audiencias comprometidas a través de WhatsApp Status. Campañas dirigidas con resultados medibles.",
+      "benefits": {
+        "globalReach": {
+          "title": "Alcance Global",
+          "description": "Accede a más de 2 mil millones de usuarios de WhatsApp en 180+ países"
+        },
+        "targetedAds": {
+          "title": "Segmentación Precisa",
+          "description": "Elige creadores por nicho, región, idioma y demografía"
+        },
+        "analytics": {
+          "title": "Analytics en Tiempo Real",
+          "description": "Rastrea vistas, engagement y ROI de tus campañas"
+        },
+        "verified": {
+          "title": "Creadores Verificados",
+          "description": "Todos los creadores pasan por verificación de audiencia y calidad"
+        }
+      },
+      "stats": {
+        "users": "Usuarios WhatsApp",
+        "countries": "Países",
+        "openRate": "Tasa de Apertura"
+      },
+      "cta": "Anunciar Ahora"
+    },
+    "creator": {
+      "badge": "Para Creadores",
+      "title": "Monetiza Tu Estado",
+      "description": "Convierte tus vistas en ingresos. Ya seas influencer o persona común, tu estado tiene valor.",
+      "benefits": {
+        "monetize": {
+          "title": "Gana con Tu Alcance",
+          "description": "Recibe pago por cada campaña publicada en tu estado"
+        },
+        "flexible": {
+          "title": "Trabaja a Tu Ritmo",
+          "description": "Acepta campañas cuando quieras, sin compromiso fijo"
+        },
+        "payments": {
+          "title": "Pago Garantizado",
+          "description": "Recibe el pago en 24h después de la aprobación"
+        },
+        "growth": {
+          "title": "Crece en la Plataforma",
+          "description": "Sube de nivel y desbloquea campañas de mayor valor"
+        }
+      },
+      "stats": {
+        "paid": "Pagado a Creadores",
+        "creators": "Creadores Activos",
+        "payout": "Pago Rápido"
+      },
+      "cta": "Empezar a Ganar"
+    },
+    "trust": {
+      "securePayments": "Pagos Seguros",
+      "verifiedCreators": "Creadores Verificados",
+      "globalSupport": "Soporte Global 24/7",
+      "multiCurrency": "Multi-Moneda"
+    }
+  },
+  "emptyState": {
+    "noCreators": "¡Sé el primero en explorar!",
+    "noCreatorsDescription": "Nuevos creadores se registran cada día. Vuelve pronto o ajusta tus filtros.",
+    "noResults": "No se encontraron resultados",
+    "noResultsDescription": "Intenta ajustar los filtros o explorar otras categorías",
+    "tryAgain": "Limpiar Filtros"
+  },
+  "global": {
+    "platform": "Plataforma global de publicidad en WhatsApp Status",
+    "tagline": "Conectando marcas y creadores en todo el mundo"
   }
 }
