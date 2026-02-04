@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { Star, Verified, MessageCircle, Eye, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,7 @@ export const PremiumCreatorCard = ({
   showFavoriteButton = false
 }: PremiumCreatorCardProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { format } = useLocalizationContext();
   const badge = badgeConfig[profile.badge_level as keyof typeof badgeConfig] || badgeConfig.bronze;
   const isNew = new Date().getTime() - new Date(profile.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
   const isTopRated = profile.rating >= 4.5 && profile.total_reviews >= 3;
@@ -62,6 +64,13 @@ export const PremiumCreatorCard = ({
   
   // Calculate response rate (mock - would come from real data)
   const responseRate = 85 + Math.floor(Math.random() * 15);
+  
+  // Parse price from price_range string or use default
+  const getBasePrice = () => {
+    if (!profile.price_range) return 50;
+    const match = profile.price_range.match(/\d+/);
+    return match ? parseInt(match[0]) : 50;
+  };
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -182,7 +191,7 @@ export const PremiumCreatorCard = ({
           <div>
             <p className="text-xs text-muted-foreground">A partir de</p>
             <p className="font-bold text-lg text-foreground">
-              {profile.price_range || "R$ 50"}
+              {format(getBasePrice())}
             </p>
           </div>
           
