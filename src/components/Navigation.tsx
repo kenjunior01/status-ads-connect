@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { 
@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { RegionCurrencySelector } from "@/components/RegionCurrencySelector";
+import { supabase } from "@/integrations/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 interface NavigationProps {
   onNavigate: (page: string) => void;
@@ -24,6 +26,48 @@ interface NavigationProps {
 export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
   const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        setTimeout(() => fetchUserRole(session.user.id), 0);
+      } else {
+        setUserRole(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data } = await supabase.rpc('get_user_role', { _user_id: userId });
+      setUserRole(data);
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    onNavigate('index');
+  };
+
+  const getDashboardPage = () => {
+    if (userRole === 'admin') return 'admin-dashboard';
+    if (userRole === 'advertiser') return 'advertiser-dashboard';
+    return 'creator-dashboard';
+  };
 
   const menuItems = [
     {
@@ -103,14 +147,29 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
           <div className="hidden md:flex items-center gap-2">
             <RegionCurrencySelector />
             <LanguageSelector />
-            <Button variant="ghost" size="sm" onClick={() => onNavigate('auth')}>
-              <LogIn className="h-4 w-4 mr-2" />
-              {t('navigation.login')}
-            </Button>
-            <Button size="sm" className="bg-gradient-primary hover:opacity-90" onClick={() => onNavigate('auth')}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              {t('navigation.register')}
-            </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => onNavigate(getDashboardPage())}>
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" onClick={() => onNavigate('auth')}>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  {t('navigation.login')}
+                </Button>
+                <Button size="sm" className="bg-gradient-primary hover:opacity-90" onClick={() => onNavigate('auth')}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  {t('navigation.register')}
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -143,14 +202,29 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
                   })}
                   
                   <div className="pt-4 border-t space-y-2">
-                    <Button variant="outline" className="w-full justify-start" onClick={() => handleNavigation('auth')}>
-                      <LogIn className="h-4 w-4 mr-2" />
-                      {t('navigation.login')}
-                    </Button>
-                    <Button className="w-full justify-start bg-gradient-primary" onClick={() => handleNavigation('auth')}>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      {t('navigation.register')}
-                    </Button>
+                    {user ? (
+                      <>
+                        <Button variant="outline" className="w-full justify-start" onClick={() => handleNavigation(getDashboardPage())}>
+                          <LayoutDashboard className="h-4 w-4 mr-2" />
+                          Dashboard
+                        </Button>
+                        <Button variant="destructive" className="w-full justify-start" onClick={handleLogout}>
+                          <LogIn className="h-4 w-4 mr-2" />
+                          Sair
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button variant="outline" className="w-full justify-start" onClick={() => handleNavigation('auth')}>
+                          <LogIn className="h-4 w-4 mr-2" />
+                          {t('navigation.login')}
+                        </Button>
+                        <Button className="w-full justify-start bg-gradient-primary" onClick={() => handleNavigation('auth')}>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          {t('navigation.register')}
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>
