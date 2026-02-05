@@ -370,5 +370,29 @@
   "global": {
     "platform": "Plataforma global de publicidade no WhatsApp Status",
     "tagline": "Conectando marcas e criadores em todo o mundo"
+  },
+  "trustIndicators": {
+    "secureDesc": "100% protegido",
+    "verifiedDesc": "Todos validados",
+    "globalReach": "Alcance Global",
+    "globalDesc": "180+ países",
+    "multiCurrency": "Multi-Moeda",
+    "currencyDesc": "11+ moedas"
+  },
+  "socialProof": {
+    "creators": "Criadores Globais",
+    "paid": "Pagos aos Criadores",
+    "rating": "4.9/5 - 2.1k avaliações",
+    "testimonial": "A StatusAds transformou meus stories em uma fonte de renda consistente. Já ganhei mais de R$ 25.000 em 3 meses!",
+    "user": "Usuário",
+    "userName": "Maria S., Criadora de Conteúdo"
+  },
+  "urgency": {
+    "limitedOffer": "Oferta Por Tempo Limitado",
+    "signupBonus": "Cadastre-se hoje e ganhe <strong>sem taxa de comissão</strong> no primeiro mês!",
+    "spotsLeft": "Restam apenas 47 vagas disponíveis"
+  },
+  "searchFilters": {
+    "level": "Nível"
   }
 }
