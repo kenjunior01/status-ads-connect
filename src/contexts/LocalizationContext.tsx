@@ -1,6 +1,6 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useLocalization } from '@/hooks/useLocalization';
-import { Currency, Country } from '@/lib/currencies';
+import { Currency, Country, currencies, countries, formatCurrency } from '@/lib/currencies';
 
 interface LocalizationContextType {
   currency: string;
@@ -16,22 +16,43 @@ interface LocalizationContextType {
   countries: Country[];
 }
 
-const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
+// Default fallback context for SSR/HMR safety
+const defaultContext: LocalizationContextType = {
+  currency: 'BRL',
+  country: 'BR',
+  region: 'south_america',
+  setCurrency: () => {},
+  setCountry: () => {},
+  setRegion: () => {},
+  format: (amount: number) => formatCurrency(amount, 'BRL', 'pt-BR'),
+  getCurrentCurrency: () => currencies.find(c => c.code === 'BRL'),
+  getCurrentCountry: () => countries.find(c => c.code === 'BR'),
+  currencies,
+  countries,
+};
+
+const LocalizationContext = createContext<LocalizationContextType>(defaultContext);
 
 export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
   const localization = useLocalization();
 
+  const value = useMemo(() => localization, [
+    localization.currency,
+    localization.country,
+    localization.region,
+    localization.format,
+    localization.setCurrency,
+    localization.setCountry,
+    localization.setRegion,
+    localization.getCurrentCurrency,
+    localization.getCurrentCountry,
+  ]);
+
   return (
-    <LocalizationContext.Provider value={localization}>
+    <LocalizationContext.Provider value={value}>
       {children}
     </LocalizationContext.Provider>
   );
 };
 
-export const useLocalizationContext = () => {
-  const context = useContext(LocalizationContext);
-  if (!context) {
-    throw new Error('useLocalizationContext must be used within a LocalizationProvider');
-  }
-  return context;
-};
+export const useLocalizationContext = () => useContext(LocalizationContext);
