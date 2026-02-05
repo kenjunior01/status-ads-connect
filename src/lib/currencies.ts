@@ -11,6 +11,7 @@ export interface Country {
   nameEn: string;
   currency: string;
   region: string;
+  flag: string;
 }
 
 export const currencies: Currency[] = [
@@ -29,36 +30,36 @@ export const currencies: Currency[] = [
 
 export const countries: Country[] = [
   // América do Sul
-  { code: 'BR', name: 'Brasil', nameEn: 'Brazil', currency: 'BRL', region: 'south_america' },
-  { code: 'AR', name: 'Argentina', nameEn: 'Argentina', currency: 'ARS', region: 'south_america' },
-  { code: 'CL', name: 'Chile', nameEn: 'Chile', currency: 'CLP', region: 'south_america' },
-  { code: 'CO', name: 'Colômbia', nameEn: 'Colombia', currency: 'COP', region: 'south_america' },
-  { code: 'PE', name: 'Peru', nameEn: 'Peru', currency: 'PEN', region: 'south_america' },
-  { code: 'UY', name: 'Uruguai', nameEn: 'Uruguay', currency: 'USD', region: 'south_america' },
-  { code: 'PY', name: 'Paraguai', nameEn: 'Paraguay', currency: 'USD', region: 'south_america' },
-  { code: 'BO', name: 'Bolívia', nameEn: 'Bolivia', currency: 'USD', region: 'south_america' },
-  { code: 'EC', name: 'Equador', nameEn: 'Ecuador', currency: 'USD', region: 'south_america' },
-  { code: 'VE', name: 'Venezuela', nameEn: 'Venezuela', currency: 'USD', region: 'south_america' },
+  { code: 'BR', name: 'Brasil', nameEn: 'Brazil', currency: 'BRL', region: 'south_america', flag: '🇧🇷' },
+  { code: 'AR', name: 'Argentina', nameEn: 'Argentina', currency: 'ARS', region: 'south_america', flag: '🇦🇷' },
+  { code: 'CL', name: 'Chile', nameEn: 'Chile', currency: 'CLP', region: 'south_america', flag: '🇨🇱' },
+  { code: 'CO', name: 'Colômbia', nameEn: 'Colombia', currency: 'COP', region: 'south_america', flag: '🇨🇴' },
+  { code: 'PE', name: 'Peru', nameEn: 'Peru', currency: 'PEN', region: 'south_america', flag: '🇵🇪' },
+  { code: 'UY', name: 'Uruguai', nameEn: 'Uruguay', currency: 'USD', region: 'south_america', flag: '🇺🇾' },
+  { code: 'PY', name: 'Paraguai', nameEn: 'Paraguay', currency: 'USD', region: 'south_america', flag: '🇵🇾' },
+  { code: 'BO', name: 'Bolívia', nameEn: 'Bolivia', currency: 'USD', region: 'south_america', flag: '🇧🇴' },
+  { code: 'EC', name: 'Equador', nameEn: 'Ecuador', currency: 'USD', region: 'south_america', flag: '🇪🇨' },
+  { code: 'VE', name: 'Venezuela', nameEn: 'Venezuela', currency: 'USD', region: 'south_america', flag: '🇻🇪' },
   
   // América do Norte e Central
-  { code: 'US', name: 'Estados Unidos', nameEn: 'United States', currency: 'USD', region: 'north_america' },
-  { code: 'MX', name: 'México', nameEn: 'Mexico', currency: 'MXN', region: 'north_america' },
-  { code: 'CA', name: 'Canadá', nameEn: 'Canada', currency: 'USD', region: 'north_america' },
+  { code: 'US', name: 'Estados Unidos', nameEn: 'United States', currency: 'USD', region: 'north_america', flag: '🇺🇸' },
+  { code: 'MX', name: 'México', nameEn: 'Mexico', currency: 'MXN', region: 'north_america', flag: '🇲🇽' },
+  { code: 'CA', name: 'Canadá', nameEn: 'Canada', currency: 'USD', region: 'north_america', flag: '🇨🇦' },
   
   // Europa
-  { code: 'PT', name: 'Portugal', nameEn: 'Portugal', currency: 'EUR', region: 'europe' },
-  { code: 'ES', name: 'Espanha', nameEn: 'Spain', currency: 'EUR', region: 'europe' },
-  { code: 'FR', name: 'França', nameEn: 'France', currency: 'EUR', region: 'europe' },
-  { code: 'DE', name: 'Alemanha', nameEn: 'Germany', currency: 'EUR', region: 'europe' },
-  { code: 'IT', name: 'Itália', nameEn: 'Italy', currency: 'EUR', region: 'europe' },
-  { code: 'GB', name: 'Reino Unido', nameEn: 'United Kingdom', currency: 'GBP', region: 'europe' },
+  { code: 'PT', name: 'Portugal', nameEn: 'Portugal', currency: 'EUR', region: 'europe', flag: '🇵🇹' },
+  { code: 'ES', name: 'Espanha', nameEn: 'Spain', currency: 'EUR', region: 'europe', flag: '🇪🇸' },
+  { code: 'FR', name: 'França', nameEn: 'France', currency: 'EUR', region: 'europe', flag: '🇫🇷' },
+  { code: 'DE', name: 'Alemanha', nameEn: 'Germany', currency: 'EUR', region: 'europe', flag: '🇩🇪' },
+  { code: 'IT', name: 'Itália', nameEn: 'Italy', currency: 'EUR', region: 'europe', flag: '🇮🇹' },
+  { code: 'GB', name: 'Reino Unido', nameEn: 'United Kingdom', currency: 'GBP', region: 'europe', flag: '🇬🇧' },
   
   // África
-  { code: 'MZ', name: 'Moçambique', nameEn: 'Mozambique', currency: 'MZN', region: 'africa' },
-  { code: 'AO', name: 'Angola', nameEn: 'Angola', currency: 'AOA', region: 'africa' },
-  { code: 'CV', name: 'Cabo Verde', nameEn: 'Cape Verde', currency: 'EUR', region: 'africa' },
-  { code: 'GW', name: 'Guiné-Bissau', nameEn: 'Guinea-Bissau', currency: 'EUR', region: 'africa' },
-  { code: 'ST', name: 'São Tomé e Príncipe', nameEn: 'São Tomé and Príncipe', currency: 'EUR', region: 'africa' },
+  { code: 'MZ', name: 'Moçambique', nameEn: 'Mozambique', currency: 'MZN', region: 'africa', flag: '🇲🇿' },
+  { code: 'AO', name: 'Angola', nameEn: 'Angola', currency: 'AOA', region: 'africa', flag: '🇦🇴' },
+  { code: 'CV', name: 'Cabo Verde', nameEn: 'Cape Verde', currency: 'EUR', region: 'africa', flag: '🇨🇻' },
+  { code: 'GW', name: 'Guiné-Bissau', nameEn: 'Guinea-Bissau', currency: 'EUR', region: 'africa', flag: '🇬🇼' },
+  { code: 'ST', name: 'São Tomé e Príncipe', nameEn: 'São Tomé and Príncipe', currency: 'EUR', region: 'africa', flag: '🇸🇹' },
 ];
 
 export const regions = [

@@ -360,6 +360,30 @@
       "multiCurrency": "Multi-Currency"
     }
   },
+  "trustIndicators": {
+    "secureDesc": "100% protected",
+    "verifiedDesc": "All validated",
+    "globalReach": "Global Reach",
+    "globalDesc": "180+ countries",
+    "multiCurrency": "Multi-Currency",
+    "currencyDesc": "11+ currencies"
+  },
+  "socialProof": {
+    "creators": "Global Creators",
+    "paid": "Paid to Creators",
+    "rating": "4.9/5 - 2.1k reviews",
+    "testimonial": "StatusAds transformed my stories into a consistent income source. I've already earned over $5,000 in 3 months!",
+    "user": "User",
+    "userName": "Maria S., Content Creator"
+  },
+  "urgency": {
+    "limitedOffer": "Limited Time Offer",
+    "signupBonus": "Sign up today and get <strong>no commission fee</strong> on your first month!",
+    "spotsLeft": "Only 47 spots remaining"
+  },
+  "searchFilters": {
+    "level": "Level"
+  },
   "emptyState": {
     "noCreators": "Be the first to explore!",
     "noCreatorsDescription": "New creators are signing up every day. Check back soon or adjust your filters.",

@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import {
   Select,
@@ -23,8 +23,11 @@ import {
   Star,
   DollarSign,
   Users,
-  TrendingUp
+  TrendingUp,
+  Globe
 } from "lucide-react";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
+import { countries, regions } from "@/lib/currencies";
 
 interface SearchFiltersProps {
   onFiltersChange?: (filters: FilterState) => void;
@@ -40,43 +43,11 @@ interface FilterState {
   niche: string;
   priceRange: number[];
   rating: number;
-  location: string;
+  region: string;
+  country: string;
   verified: boolean;
   badgeLevel: string;
 }
-
-const niches = [
-  "Beleza & Moda",
-  "Fitness & Saúde", 
-  "Tecnologia",
-  "Lifestyle",
-  "Culinária",
-  "Viagem",
-  "Games",
-  "Educação",
-  "Negócios",
-  "Arte & Design"
-];
-
-const locations = [
-  "São Paulo",
-  "Rio de Janeiro", 
-  "Belo Horizonte",
-  "Brasília",
-  "Porto Alegre",
-  "Salvador",
-  "Recife",
-  "Curitiba",
-  "Fortaleza",
-  "Goiânia"
-];
-
-const badgeLevels = [
-  { value: "bronze", label: "Novo Talento", color: "bg-amber-600" },
-  { value: "silver", label: "Em Crescimento", color: "bg-slate-400" },
-  { value: "gold", label: "Top Performer", color: "bg-amber-400" },
-  { value: "platinum", label: "Elite", color: "bg-purple-500" }
-];
 
 export const SearchFilters = ({ 
   onFiltersChange,
@@ -86,12 +57,36 @@ export const SearchFilters = ({
   showLocationFilter = true,
   className 
 }: SearchFiltersProps) => {
+  const { t } = useTranslation();
+  const { format } = useLocalizationContext();
+
+  const niches = [
+    { value: "beauty", label: t('niches.beauty') },
+    { value: "fitness", label: t('niches.fitness') },
+    { value: "tech", label: t('niches.tech') },
+    { value: "lifestyle", label: t('niches.lifestyle') },
+    { value: "food", label: t('niches.food') },
+    { value: "travel", label: t('niches.travel') },
+    { value: "entertainment", label: t('niches.entertainment') },
+    { value: "education", label: t('niches.education') },
+    { value: "business", label: t('niches.business') },
+    { value: "fashion", label: t('niches.fashion') }
+  ];
+
+  const badgeLevels = [
+    { value: "bronze", label: t('creator.badges.bronze') },
+    { value: "silver", label: t('creator.badges.silver') },
+    { value: "gold", label: t('creator.badges.gold') },
+    { value: "platinum", label: t('creator.badges.platinum') }
+  ];
+
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     niche: "",
     priceRange: [0, 1000],
     rating: 0,
-    location: "",
+    region: "",
+    country: "",
     verified: false,
     badgeLevel: ""
   });
@@ -110,16 +105,26 @@ export const SearchFilters = ({
   const updateActiveFilters = (currentFilters: FilterState) => {
     const active: string[] = [];
     
-    if (currentFilters.niche) active.push(`Nicho: ${currentFilters.niche}`);
-    if (currentFilters.location) active.push(`Local: ${currentFilters.location}`);
-    if (currentFilters.rating > 0) active.push(`${currentFilters.rating}+ estrelas`);
-    if (currentFilters.verified) active.push("Verificados");
+    if (currentFilters.niche) {
+      const niche = niches.find(n => n.value === currentFilters.niche);
+      active.push(`${t('filters.niches')}: ${niche?.label || currentFilters.niche}`);
+    }
+    if (currentFilters.region) {
+      const region = regions.find(r => r.code === currentFilters.region);
+      active.push(`${t('localization.selectRegion')}: ${region?.name || currentFilters.region}`);
+    }
+    if (currentFilters.country) {
+      const country = countries.find(c => c.code === currentFilters.country);
+      active.push(`${t('localization.selectCountry')}: ${country?.flag} ${country?.name || currentFilters.country}`);
+    }
+    if (currentFilters.rating > 0) active.push(`${currentFilters.rating}+ ⭐`);
+    if (currentFilters.verified) active.push(t('filters.verified'));
     if (currentFilters.badgeLevel) {
       const badge = badgeLevels.find(b => b.value === currentFilters.badgeLevel);
       if (badge) active.push(badge.label);
     }
     if (currentFilters.priceRange[0] > 0 || currentFilters.priceRange[1] < 1000) {
-      active.push(`R$ ${currentFilters.priceRange[0]} - R$ ${currentFilters.priceRange[1]}`);
+      active.push(`${format(currentFilters.priceRange[0])} - ${format(currentFilters.priceRange[1])}`);
     }
 
     setActiveFilters(active);
@@ -128,12 +133,13 @@ export const SearchFilters = ({
   const clearFilter = (filterText: string) => {
     const newFilters = { ...filters };
     
-    if (filterText.includes("Nicho:")) newFilters.niche = "";
-    if (filterText.includes("Local:")) newFilters.location = "";
-    if (filterText.includes("estrelas")) newFilters.rating = 0;
-    if (filterText === "Verificados") newFilters.verified = false;
+    if (filterText.includes(t('filters.niches'))) newFilters.niche = "";
+    if (filterText.includes(t('localization.selectRegion'))) newFilters.region = "";
+    if (filterText.includes(t('localization.selectCountry'))) newFilters.country = "";
+    if (filterText.includes("⭐")) newFilters.rating = 0;
+    if (filterText === t('filters.verified')) newFilters.verified = false;
     if (badgeLevels.some(b => b.label === filterText)) newFilters.badgeLevel = "";
-    if (filterText.includes("R$")) newFilters.priceRange = [0, 1000];
+    if (filterText.includes(" - ") && !filterText.includes(":")) newFilters.priceRange = [0, 1000];
 
     setFilters(newFilters);
     onFiltersChange?.(newFilters);
@@ -146,7 +152,8 @@ export const SearchFilters = ({
       niche: "",
       priceRange: [0, 1000],
       rating: 0,
-      location: "",
+      region: "",
+      country: "",
       verified: false,
       badgeLevel: ""
     };
@@ -163,7 +170,7 @@ export const SearchFilters = ({
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar criadores, nichos, localização..."
+            placeholder={t('hero.searchPlaceholder')}
             className="pl-10"
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
@@ -174,7 +181,7 @@ export const SearchFilters = ({
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
-              Filtros
+              {t('common.filter')}
               {activeFilters.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
                   {activeFilters.length}
@@ -185,27 +192,77 @@ export const SearchFilters = ({
           <PopoverContent className="w-80" align="end">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium">Filtros</h4>
+                <h4 className="font-medium">{t('filters.title')}</h4>
                 {activeFilters.length > 0 && (
                   <Button variant="ghost" size="sm" onClick={clearAllFilters}>
-                    Limpar tudo
+                    {t('filters.clearAll')}
                   </Button>
                 )}
               </div>
 
+              {/* Region Filter */}
+              {showLocationFilter && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Globe className="h-4 w-4" />
+                    {t('localization.selectRegion')}
+                  </label>
+                  <Select value={filters.region} onValueChange={(value) => {
+                    updateFilter("region", value);
+                    updateFilter("country", "");
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('common.all')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{t('common.all')}</SelectItem>
+                      {regions.map((region) => (
+                        <SelectItem key={region.code} value={region.code}>
+                          {region.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Country Filter */}
+              {showLocationFilter && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    {t('localization.selectCountry')}
+                  </label>
+                  <Select value={filters.country} onValueChange={(value) => updateFilter("country", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('common.all')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">{t('common.all')}</SelectItem>
+                      {countries
+                        .filter(c => !filters.region || c.region === filters.region)
+                        .map((country) => (
+                          <SelectItem key={country.code} value={country.code}>
+                            {country.flag} {country.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {/* Niche Filter */}
               {showNicheFilter && (
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Nicho</label>
+                  <label className="text-sm font-medium mb-2 block">{t('filters.niches')}</label>
                   <Select value={filters.niche} onValueChange={(value) => updateFilter("niche", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecionar nicho" />
+                      <SelectValue placeholder={t('filters.selectNiches')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos os nichos</SelectItem>
+                      <SelectItem value="">{t('common.all')}</SelectItem>
                       {niches.map((niche) => (
-                        <SelectItem key={niche} value={niche}>
-                          {niche}
+                        <SelectItem key={niche.value} value={niche.value}>
+                          {niche.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -218,7 +275,7 @@ export const SearchFilters = ({
                 <div>
                   <label className="text-sm font-medium mb-2 block flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Faixa de Preço: R$ {filters.priceRange[0]} - R$ {filters.priceRange[1]}
+                    {t('filters.priceRange')}: {format(filters.priceRange[0])} - {format(filters.priceRange[1])}
                   </label>
                   <Slider
                     value={filters.priceRange}
@@ -236,40 +293,20 @@ export const SearchFilters = ({
                 <div>
                   <label className="text-sm font-medium mb-2 block flex items-center gap-2">
                     <Star className="h-4 w-4" />
-                    Avaliação Mínima
+                    {t('filters.engagement')}
                   </label>
                   <Select 
                     value={filters.rating.toString()} 
                     onValueChange={(value) => updateFilter("rating", parseFloat(value))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Qualquer avaliação" />
+                      <SelectValue placeholder={t('common.all')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0">Qualquer avaliação</SelectItem>
-                      <SelectItem value="3">3+ estrelas</SelectItem>
-                      <SelectItem value="4">4+ estrelas</SelectItem>
-                      <SelectItem value="4.5">4.5+ estrelas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {/* Location Filter */}
-              {showLocationFilter && (
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Localização</label>
-                  <Select value={filters.location} onValueChange={(value) => updateFilter("location", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Qualquer localização" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Qualquer localização</SelectItem>
-                      {locations.map((location) => (
-                        <SelectItem key={location} value={location}>
-                          {location}
-                        </SelectItem>
-                      ))}
+                      <SelectItem value="0">{t('common.all')}</SelectItem>
+                      <SelectItem value="3">3+ ⭐</SelectItem>
+                      <SelectItem value="4">4+ ⭐</SelectItem>
+                      <SelectItem value="4.5">4.5+ ⭐</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -279,14 +316,14 @@ export const SearchFilters = ({
               <div>
                 <label className="text-sm font-medium mb-2 block flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Nível
+                  {t('searchFilters.level')}
                 </label>
                 <Select value={filters.badgeLevel} onValueChange={(value) => updateFilter("badgeLevel", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Qualquer nível" />
+                    <SelectValue placeholder={t('common.all')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Qualquer nível</SelectItem>
+                    <SelectItem value="">{t('common.all')}</SelectItem>
                     {badgeLevels.map((badge) => (
                       <SelectItem key={badge.value} value={badge.value}>
                         {badge.label}

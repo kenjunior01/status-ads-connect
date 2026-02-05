@@ -1,32 +1,36 @@
-import { Shield, Award, Users, CheckCircle, Clock, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Shield, Award, Users, CheckCircle, Clock, Star, Globe, CreditCard } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 
 interface TrustIndicatorsProps {
   className?: string;
 }
 
 export const TrustIndicators = ({ className }: TrustIndicatorsProps) => {
+  const { t } = useTranslation();
+  
   const indicators = [
     {
       icon: Shield,
-      label: "Pagamentos Seguros",
-      description: "100% protegido"
+      label: t('trust.securePayment'),
+      description: t('trustIndicators.secureDesc')
     },
     {
       icon: CheckCircle,
-      label: "Perfis Verificados",
-      description: "Todos validados"
+      label: t('trust.verifiedCreators'),
+      description: t('trustIndicators.verifiedDesc')
     },
     {
-      icon: Clock,
-      label: "Suporte 24h",
-      description: "Sempre disponível"
+      icon: Globe,
+      label: t('trustIndicators.globalReach'),
+      description: t('trustIndicators.globalDesc')
     },
     {
-      icon: Award,
-      label: "Qualidade Garantida",
-      description: "Ou devolvemos seu dinheiro"
+      icon: CreditCard,
+      label: t('trustIndicators.multiCurrency'),
+      description: t('trustIndicators.currencyDesc')
     }
   ];
 
@@ -60,16 +64,19 @@ interface SocialProofProps {
 }
 
 export const SocialProof = ({ className }: SocialProofProps) => {
+  const { t } = useTranslation();
+  const { format } = useLocalizationContext();
+  
   return (
     <div className={cn("text-center space-y-4", className)}>
       <div className="flex justify-center items-center gap-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">5.2k+</div>
-          <div className="text-xs text-muted-foreground">Criadores Ativos</div>
+          <div className="text-2xl font-bold text-primary">10K+</div>
+          <div className="text-xs text-muted-foreground">{t('socialProof.creators')}</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-success">R$ 2.5M+</div>
-          <div className="text-xs text-muted-foreground">Pagos aos Usuários</div>
+          <div className="text-2xl font-bold text-success">{format(5000000)}</div>
+          <div className="text-xs text-muted-foreground">{t('socialProof.paid')}</div>
         </div>
         <div className="text-center">
           <div className="flex justify-center mb-1">
@@ -77,25 +84,24 @@ export const SocialProof = ({ className }: SocialProofProps) => {
               <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
             ))}
           </div>
-          <div className="text-xs text-muted-foreground">4.9/5 - 2.1k avaliações</div>
+          <div className="text-xs text-muted-foreground">{t('socialProof.rating')}</div>
         </div>
       </div>
       
       <div className="bg-muted/50 rounded-lg p-4">
         <p className="text-sm text-muted-foreground italic">
-          "A StatusAds transformou meus stories em uma fonte de renda consistente. 
-          Já ganhei mais de R$ 5.000 em 3 meses!"
+          "{t('socialProof.testimonial')}"
         </p>
         <div className="mt-2 flex items-center justify-center gap-2">
           <img 
             src="/placeholder.svg" 
-            alt="Usuário" 
+            alt={t('socialProof.user')} 
             className="w-6 h-6 rounded-full"
           />
           <span className="text-xs text-muted-foreground">
-            Maria S., Criadora de Conteúdo
+            {t('socialProof.userName')}
           </span>
-          <Badge variant="secondary" className="text-xs">Verificada</Badge>
+          <Badge variant="secondary" className="text-xs">{t('creator.verified')}</Badge>
         </div>
       </div>
     </div>
@@ -108,17 +114,19 @@ interface UrgencyCounterProps {
 }
 
 export const UrgencyCounter = ({ endTime, className }: UrgencyCounterProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className={cn("bg-warning/10 border border-warning/20 rounded-lg p-4", className)}>
       <div className="flex items-center gap-2 mb-2">
         <Clock className="h-4 w-4 text-warning" />
-        <span className="text-sm font-medium text-warning">Oferta Por Tempo Limitado</span>
+        <span className="text-sm font-medium text-warning">{t('urgency.limitedOffer')}</span>
       </div>
       <p className="text-xs text-muted-foreground">
-        Cadastre-se hoje e ganhe <strong>sem taxa de comissão</strong> no primeiro mês!
+        {t('urgency.signupBonus')}
       </p>
       <div className="mt-2 text-xs text-warning font-medium">
-        ⏰ Restam apenas 47 vagas disponíveis
+        ⏰ {t('urgency.spotsLeft')}
       </div>
     </div>
   );
