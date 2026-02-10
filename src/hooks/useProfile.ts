@@ -33,6 +33,7 @@ export const useProfile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
   const fetchProfile = async () => {
@@ -51,11 +52,7 @@ export const useProfile = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
-      }
-
+      if (error) throw error;
       setProfile(data);
     } catch (err) {
       console.error('Error fetching profile:', err);
@@ -69,21 +66,67 @@ export const useProfile = () => {
     }
   };
 
+  const uploadAvatar = async (file: File): Promise<string | null> => {
+    try {
+      setUploading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Usuário não autenticado');
+
+      // Validate file
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size > maxSize) {
+        toast({ title: "Arquivo muito grande", description: "O avatar deve ter no máximo 5MB.", variant: "destructive" });
+        return null;
+      }
+
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({ title: "Formato inválido", description: "Use JPG, PNG ou WebP.", variant: "destructive" });
+        return null;
+      }
+
+      const ext = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${ext}`;
+
+      // Delete existing avatar first
+      await supabase.storage.from('avatars').remove([filePath]);
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Add cache buster
+      const avatarUrl = `${publicUrl}?t=${Date.now()}`;
+
+      // Update profile with new avatar URL
+      await updateProfile({ avatar_url: avatarUrl });
+
+      toast({ title: "Avatar atualizado!", description: "Sua foto de perfil foi salva." });
+      return avatarUrl;
+    } catch (err) {
+      console.error('Error uploading avatar:', err);
+      toast({ title: "Erro no upload", description: "Não foi possível enviar a imagem.", variant: "destructive" });
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const updateProfile = async (updates: ProfileUpdate) => {
     try {
       setSaving(true);
       const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error('Usuário não autenticado');
-      }
+      if (!user) throw new Error('Usuário não autenticado');
 
       const { data, error } = await supabase
         .from('profiles')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
+        .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
         .select()
         .single();
@@ -91,19 +134,11 @@ export const useProfile = () => {
       if (error) throw error;
 
       setProfile(data);
-      toast({
-        title: "Perfil atualizado!",
-        description: "Suas informações foram salvas com sucesso.",
-      });
-
+      toast({ title: "Perfil atualizado!", description: "Suas informações foram salvas com sucesso." });
       return data;
     } catch (err) {
       console.error('Error updating profile:', err);
-      toast({
-        title: "Erro ao salvar",
-        description: "Ocorreu um erro ao atualizar seu perfil.",
-        variant: "destructive",
-      });
+      toast({ title: "Erro ao salvar", description: "Ocorreu um erro ao atualizar seu perfil.", variant: "destructive" });
       throw err;
     } finally {
       setSaving(false);
@@ -112,19 +147,11 @@ export const useProfile = () => {
 
   useEffect(() => {
     fetchProfile();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       fetchProfile();
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
-  return {
-    profile,
-    loading,
-    saving,
-    updateProfile,
-    refetch: fetchProfile,
-  };
+  return { profile, loading, saving, uploading, updateProfile, uploadAvatar, refetch: fetchProfile };
 };
