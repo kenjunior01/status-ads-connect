@@ -72,44 +72,74 @@ export type Database = {
       }
       campaigns: {
         Row: {
+          actual_views: number | null
           advertiser_id: string
           completed_at: string | null
+          cpv_rate: number | null
           created_at: string | null
           creator_id: string
+          creator_payout: number | null
           description: string | null
+          duration_days: number | null
+          escrow_amount: number | null
+          escrow_status: string | null
+          expected_views: number | null
           id: string
+          platform_fee: number | null
           price: number
           proof_deadline: string | null
           proof_required: boolean | null
+          publish_deadline: string | null
           status: string | null
+          stripe_payment_intent_id: string | null
           title: string
           verification_status: string | null
         }
         Insert: {
+          actual_views?: number | null
           advertiser_id: string
           completed_at?: string | null
+          cpv_rate?: number | null
           created_at?: string | null
           creator_id: string
+          creator_payout?: number | null
           description?: string | null
+          duration_days?: number | null
+          escrow_amount?: number | null
+          escrow_status?: string | null
+          expected_views?: number | null
           id?: string
+          platform_fee?: number | null
           price: number
           proof_deadline?: string | null
           proof_required?: boolean | null
+          publish_deadline?: string | null
           status?: string | null
+          stripe_payment_intent_id?: string | null
           title: string
           verification_status?: string | null
         }
         Update: {
+          actual_views?: number | null
           advertiser_id?: string
           completed_at?: string | null
+          cpv_rate?: number | null
           created_at?: string | null
           creator_id?: string
+          creator_payout?: number | null
           description?: string | null
+          duration_days?: number | null
+          escrow_amount?: number | null
+          escrow_status?: string | null
+          expected_views?: number | null
           id?: string
+          platform_fee?: number | null
           price?: number
           proof_deadline?: string | null
           proof_required?: boolean | null
+          publish_deadline?: string | null
           status?: string | null
+          stripe_payment_intent_id?: string | null
           title?: string
           verification_status?: string | null
         }
@@ -205,6 +235,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      creator_wallets: {
+        Row: {
+          available_balance: number
+          created_at: string | null
+          id: string
+          pending_balance: number
+          total_earned: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          created_at?: string | null
+          id?: string
+          pending_balance?: number
+          total_earned?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          created_at?: string | null
+          id?: string
+          pending_balance?: number
+          total_earned?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       disputes: {
         Row: {
@@ -302,8 +362,11 @@ export type Database = {
           avatar_url: string | null
           badge_level: string | null
           bio: string | null
+          cpv_rate: number | null
           created_at: string | null
           display_name: string | null
+          engagement_rate: number | null
+          follower_count: number | null
           id: string
           is_verified: boolean | null
           niche: string | null
@@ -319,8 +382,11 @@ export type Database = {
           avatar_url?: string | null
           badge_level?: string | null
           bio?: string | null
+          cpv_rate?: number | null
           created_at?: string | null
           display_name?: string | null
+          engagement_rate?: number | null
+          follower_count?: number | null
           id?: string
           is_verified?: boolean | null
           niche?: string | null
@@ -336,8 +402,11 @@ export type Database = {
           avatar_url?: string | null
           badge_level?: string | null
           bio?: string | null
+          cpv_rate?: number | null
           created_at?: string | null
           display_name?: string | null
+          engagement_rate?: number | null
+          follower_count?: number | null
           id?: string
           is_verified?: boolean | null
           niche?: string | null
@@ -382,6 +451,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "reviews_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          net_amount: number | null
+          payee_id: string
+          payer_id: string
+          platform_fee: number | null
+          status: string | null
+          stripe_payment_intent_id: string | null
+          type: string
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          net_amount?: number | null
+          payee_id: string
+          payer_id: string
+          platform_fee?: number | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          type: string
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          net_amount?: number | null
+          payee_id?: string
+          payer_id?: string
+          platform_fee?: number | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "campaigns"
@@ -439,11 +564,49 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawals: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          pix_key: string | null
+          processed_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          pix_key?: string | null
+          processed_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          pix_key?: string | null
+          processed_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_cpv_rate: {
+        Args: {
+          _engagement_rate: number
+          _follower_count: number
+          _niche?: string
+        }
+        Returns: number
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

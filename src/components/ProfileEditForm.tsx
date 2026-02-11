@@ -21,6 +21,8 @@ export const ProfileEditForm = () => {
     price_range: "",
     price_per_post: "",
     avatar_url: "",
+    follower_count: "",
+    engagement_rate: "",
   });
 
   useEffect(() => {
@@ -32,6 +34,8 @@ export const ProfileEditForm = () => {
         price_range: profile.price_range || "",
         price_per_post: profile.price_per_post?.toString() || "",
         avatar_url: profile.avatar_url || "",
+        follower_count: profile.follower_count?.toString() || "",
+        engagement_rate: profile.engagement_rate?.toString() || "",
       });
     }
   }, [profile]);
@@ -69,6 +73,12 @@ export const ProfileEditForm = () => {
     };
     if (formData.price_per_post) {
       updates.price_per_post = parseFloat(formData.price_per_post);
+    }
+    if (formData.follower_count) {
+      updates.follower_count = parseInt(formData.follower_count);
+    }
+    if (formData.engagement_rate) {
+      updates.engagement_rate = parseFloat(formData.engagement_rate);
     }
     await updateProfile(updates);
   };
@@ -258,6 +268,50 @@ export const ProfileEditForm = () => {
               Valor base que será exibido no seu perfil público
             </p>
           </div>
+
+          {/* CPV Fields */}
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="pt-4 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-semibold">📊 Dados de Audiência (CPV)</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Esses dados são usados para calcular automaticamente seu CPV (Custo por Visualização).
+              </p>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="follower_count">Seguidores no WhatsApp</Label>
+                  <Input
+                    id="follower_count"
+                    type="number"
+                    min="0"
+                    value={formData.follower_count}
+                    onChange={(e) => setFormData({ ...formData, follower_count: e.target.value })}
+                    placeholder="Ex: 5000"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="engagement_rate">Taxa de Engajamento (%)</Label>
+                  <Input
+                    id="engagement_rate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={formData.engagement_rate}
+                    onChange={(e) => setFormData({ ...formData, engagement_rate: e.target.value })}
+                    placeholder="Ex: 5.0"
+                  />
+                </div>
+              </div>
+              {profile?.cpv_rate && Number(profile.cpv_rate) > 0 && (
+                <div className="p-3 bg-background rounded-lg border">
+                  <p className="text-sm font-medium">Seu CPV calculado: <span className="text-primary font-bold">R$ {Number(profile.cpv_rate).toFixed(4)}</span></p>
+                  <p className="text-xs text-muted-foreground mt-1">Baseado nos seus seguidores, engajamento e nicho</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
 
