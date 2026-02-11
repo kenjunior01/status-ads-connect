@@ -13,6 +13,7 @@ import { EarningsChart } from "@/components/EarningsChart";
 import { NotificationButton } from "@/components/NotificationsPanel";
 import { ProofUploadForm } from "@/components/ProofUploadForm";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import { CreatorWallet } from "@/components/CreatorWallet";
 import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { 
@@ -24,7 +25,8 @@ import {
   Award,
   Target,
   Loader2,
-  Upload
+  Upload,
+  Wallet
 } from "lucide-react";
 
 type VerificationStatus = 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected';
@@ -82,9 +84,13 @@ export const CreatorDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
+            <TabsTrigger value="wallet" className="flex items-center gap-1">
+              <Wallet className="h-4 w-4" />
+              Carteira
+            </TabsTrigger>
             <TabsTrigger value="earnings">Ganhos</TabsTrigger>
             <TabsTrigger value="profile">Perfil</TabsTrigger>
           </TabsList>
@@ -176,6 +182,8 @@ export const CreatorDashboard = () => {
               </div>
             )}
           </TabsContent>
+
+          <TabsContent value="wallet"><CreatorWallet /></TabsContent>
 
           <TabsContent value="earnings"><EarningsChart /></TabsContent>
 

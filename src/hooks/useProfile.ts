@@ -16,6 +16,9 @@ interface Profile {
   total_campaigns: number | null;
   is_verified: boolean | null;
   badge_level: string | null;
+  follower_count: number | null;
+  engagement_rate: number | null;
+  cpv_rate: number | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -27,6 +30,8 @@ interface ProfileUpdate {
   niche?: string;
   price_range?: string;
   price_per_post?: number;
+  follower_count?: number;
+  engagement_rate?: number;
 }
 
 export const useProfile = () => {
