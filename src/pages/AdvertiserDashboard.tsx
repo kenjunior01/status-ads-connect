@@ -14,9 +14,11 @@ import { CreateCampaignDialog } from "@/components/CreateCampaignForm";
 import { NotificationButton } from "@/components/NotificationsPanel";
 import { ProofReviewPanel } from "@/components/ProofReviewPanel";
 import { VerificationBadge } from "@/components/VerificationBadge";
+import { StatusAIMatchmaker } from "@/components/StatusAIMatchmaker";
+import { StatusAIROIPredictor } from "@/components/StatusAIROIPredictor";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
-import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle } from "lucide-react";
+import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot } from "lucide-react";
 
 export const AdvertiserDashboard = () => {
   const { t } = useTranslation();
@@ -94,7 +96,7 @@ export const AdvertiserDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
             <TabsTrigger value="verification" className="flex items-center gap-1">
@@ -102,6 +104,10 @@ export const AdvertiserDashboard = () => {
               Verificação
             </TabsTrigger>
             <TabsTrigger value="creators">Criadores</TabsTrigger>
+            <TabsTrigger value="statusai" className="flex items-center gap-1">
+              <Bot className="h-4 w-4" />
+              StatusAI
+            </TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -251,6 +257,37 @@ export const AdvertiserDashboard = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+
+          <TabsContent value="statusai" className="space-y-6">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Bot className="h-5 w-5 text-primary" />
+              StatusAI — Inteligência Artificial
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <StatusAIMatchmaker />
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm">Previsão de ROI por Criador</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Selecione um criador na aba "Criadores" e use o StatusAI para prever o retorno.
+                    </p>
+                    {profiles.slice(0, 3).map((creator) => (
+                      <div key={creator.id} className="mb-4">
+                        <StatusAIROIPredictor 
+                          creatorId={creator.profile_id || creator.id} 
+                          creatorName={creator.display_name} 
+                        />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="analytics"><AnalyticsDashboard /></TabsContent>
