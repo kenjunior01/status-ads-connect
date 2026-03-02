@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useCampaignProofs } from '@/hooks/useCampaignProofs';
+import { StatusAIProofValidator } from '@/components/StatusAIProofValidator';
 import { 
   CheckCircle, 
   XCircle, 
@@ -171,6 +172,13 @@ export const ProofReviewPanel = ({ campaignId, isAdvertiser = false }: ProofRevi
                       {t('verification.notes')}
                     </div>
                     <p className="text-sm text-muted-foreground">{proof.reviewer_notes}</p>
+                  </div>
+                )}
+
+                {/* StatusAI Validation */}
+                {proof.proof_type === 'screenshot' && proof.file_url && proof.status === 'pending' && (
+                  <div className="pt-3 border-t">
+                    <StatusAIProofValidator proofId={proof.id} imageUrl={proof.file_url} />
                   </div>
                 )}
 
