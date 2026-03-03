@@ -9,7 +9,8 @@ import {
   Menu,
   LogIn,
   UserPlus,
-  Search
+  Search,
+  BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -81,6 +82,12 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
       icon: Search,
       page: "creators",
       description: t('navigation.explore')
+    },
+    {
+      title: "Dashboard Global",
+      icon: BarChart3,
+      page: "global-dashboard",
+      description: "Métricas da rede"
     },
     {
       title: t('navigation.creators'),
