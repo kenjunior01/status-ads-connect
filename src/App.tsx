@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import { CreatorDashboard } from "./pages/CreatorDashboard";
 import { AdvertiserDashboard } from "./pages/AdvertiserDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { GlobalDashboard } from "./pages/GlobalDashboard";
 
 // Initialize i18n
 import "@/lib/i18n";
@@ -31,6 +32,8 @@ function App() {
         return <AdvertiserDashboard />;
       case "admin-dashboard":
         return <AdminDashboard />;
+      case "global-dashboard":
+        return <GlobalDashboard />;
       case "creators":
         return <Index onNavigate={setCurrentPage} />;
       default:
