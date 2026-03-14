@@ -250,58 +250,8 @@ const Index = ({ onNavigate }: IndexProps) => {
         </div>
       </section>
 
-      {/* Trust Stats Bar - Global Stats */}
-      <section className="py-6 px-4 bg-card border-b border-border">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Globe className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-bold text-xl text-foreground">180+</p>
-                <p className="text-xs text-muted-foreground">{t('valueProposition.business.stats.countries')}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-bold text-xl text-foreground">10K+</p>
-                <p className="text-xs text-muted-foreground">{t('hero.stats.creators')}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-success/10 rounded-lg">
-                <DollarSign className="h-5 w-5 text-success" />
-              </div>
-              <div>
-                <p className="font-bold text-xl text-foreground">{format(5000000)}</p>
-                <p className="text-xs text-muted-foreground">{t('hero.stats.paid')}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-warning/10 rounded-lg">
-                <Star className="h-5 w-5 text-warning" />
-              </div>
-              <div>
-                <p className="font-bold text-xl text-foreground">4.9★</p>
-                <p className="text-xs text-muted-foreground">{t('creator.rating')}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-accent/10 rounded-lg">
-                <Shield className="h-5 w-5 text-accent" />
-              </div>
-              <div>
-                <p className="font-bold text-xl text-foreground">100%</p>
-                <p className="text-xs text-muted-foreground">{t('trust.securePayment')}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Trust Stats Bar - Global Stats (Real Data) */}
+      <TrustStatsBar />
 
       {/* Main Listings Section with Sidebar */}
       <section className="py-12 px-4">
