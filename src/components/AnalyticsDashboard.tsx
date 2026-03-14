@@ -58,10 +58,10 @@ export const AnalyticsDashboard = () => {
       .slice(0, 5)
       .map(c => ({
         name: c.title,
-        reach: Number(c.actual_views) || 0,
-        engagement: Number(c.actual_views) > 0 ? Math.round((Number(c.actual_views) / (Number(c.expected_views) || 1)) * 100) : 0,
+        reach: 0,
+        engagement: 0,
         cost: Number(c.price),
-        roi: Number(c.actual_views) > 0 ? Math.round(((Number(c.actual_views) * (Number(c.cpv_rate) || 0.01)) / Number(c.price)) * 100) : 0,
+        roi: 0,
       }));
 
     const totalValue = campaigns.reduce((s, c) => s + Number(c.price), 0);
