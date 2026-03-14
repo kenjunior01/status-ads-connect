@@ -33,23 +33,7 @@ import {
   Cell,
 } from "recharts";
 
-interface PlatformStats {
-  overview: {
-    total_creators: number;
-    total_campaigns: number;
-    active_campaigns: number;
-    completed_campaigns: number;
-    total_views: number;
-    total_revenue: number;
-    total_paid_to_creators: number;
-    total_campaign_value: number;
-    completion_rate: number;
-    avg_campaign_value: number;
-  };
-  niche_distribution: { name: string; count: number }[];
-  activity_timeline: { date: string; campaigns: number; volume: number }[];
-  updated_at: string;
-}
+// PlatformStats type is imported from the hook
 
 const NICHE_COLORS = [
   "hsl(217, 91%, 60%)",
