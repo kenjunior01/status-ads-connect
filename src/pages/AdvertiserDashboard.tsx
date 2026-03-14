@@ -89,8 +89,8 @@ export const AdvertiserDashboard = () => {
         )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="primary" trend={{ value: 25, isPositive: true }} />
-          <MetricsCard title="Total Investido" value={`R$ ${totalSpent.toFixed(0)}`} icon={DollarSign} variant="success" trend={{ value: 15.2, isPositive: true }} />
+          <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="primary" />
+          <MetricsCard title="Total Investido" value={`R$ ${totalSpent.toFixed(0)}`} icon={DollarSign} variant="success" />
           <MetricsCard title="Criadores Disponíveis" value={profiles.length} icon={Eye} variant="warning" subtitle="na plataforma" />
           <MetricsCard title="Campanhas Totais" value={campaigns.length} icon={TrendingUp} variant="default" />
         </div>
