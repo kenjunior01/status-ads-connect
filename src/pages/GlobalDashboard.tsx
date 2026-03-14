@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { usePlatformStats, type PlatformStats } from "@/hooks/usePlatformStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -33,23 +33,7 @@ import {
   Cell,
 } from "recharts";
 
-interface PlatformStats {
-  overview: {
-    total_creators: number;
-    total_campaigns: number;
-    active_campaigns: number;
-    completed_campaigns: number;
-    total_views: number;
-    total_revenue: number;
-    total_paid_to_creators: number;
-    total_campaign_value: number;
-    completion_rate: number;
-    avg_campaign_value: number;
-  };
-  niche_distribution: { name: string; count: number }[];
-  activity_timeline: { date: string; campaigns: number; volume: number }[];
-  updated_at: string;
-}
+// PlatformStats type is imported from the hook
 
 const NICHE_COLORS = [
   "hsl(217, 91%, 60%)",
@@ -93,28 +77,7 @@ const AnimatedNumber = ({ value, prefix = "", suffix = "" }: { value: number; pr
 };
 
 export const GlobalDashboard = () => {
-  const [stats, setStats] = useState<PlatformStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const { data, error: fnError } = await supabase.functions.invoke("platform-stats");
-        if (fnError) throw fnError;
-        if (data?.error) throw new Error(data.error);
-        setStats(data);
-      } catch (err: any) {
-        setError(err.message || "Erro ao carregar estatísticas");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
-    // Refresh every 60s
-    const interval = setInterval(fetchStats, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const { stats, loading, error } = usePlatformStats();
 
   if (loading) {
     return (

@@ -1,8 +1,10 @@
 import { useTranslation } from "react-i18next";
-import { Shield, Award, Users, CheckCircle, Clock, Star, Globe, CreditCard } from "lucide-react";
+import { Shield, CheckCircle, Globe, CreditCard, Clock, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TrustIndicatorsProps {
   className?: string;
@@ -66,25 +68,40 @@ interface SocialProofProps {
 export const SocialProof = ({ className }: SocialProofProps) => {
   const { t } = useTranslation();
   const { format } = useLocalizationContext();
+  const { stats, loading } = usePlatformStats();
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toLocaleString('pt-BR');
+  };
   
   return (
     <div className={cn("text-center space-y-4", className)}>
       <div className="flex justify-center items-center gap-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">10K+</div>
+          {loading ? <Skeleton className="h-8 w-16 mx-auto" /> : (
+            <div className="text-2xl font-bold text-primary">
+              {formatNumber(stats?.overview.total_creators || 0)}
+            </div>
+          )}
           <div className="text-xs text-muted-foreground">{t('socialProof.creators')}</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-success">{format(5000000)}</div>
+          {loading ? <Skeleton className="h-8 w-20 mx-auto" /> : (
+            <div className="text-2xl font-bold text-success">
+              {format(stats?.overview.total_campaign_value || 0)}
+            </div>
+          )}
           <div className="text-xs text-muted-foreground">{t('socialProof.paid')}</div>
         </div>
         <div className="text-center">
-          <div className="flex justify-center mb-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="h-4 w-4 text-amber-400 fill-amber-400" />
-            ))}
-          </div>
-          <div className="text-xs text-muted-foreground">{t('socialProof.rating')}</div>
+          {loading ? <Skeleton className="h-8 w-16 mx-auto" /> : (
+            <div className="text-2xl font-bold text-warning">
+              {stats?.overview.completion_rate || 0}%
+            </div>
+          )}
+          <div className="text-xs text-muted-foreground">Conclusão</div>
         </div>
       </div>
       

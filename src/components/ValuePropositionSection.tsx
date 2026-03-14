@@ -2,14 +2,15 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { usePlatformStats } from "@/hooks/usePlatformStats";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import {
   Building2,
   User,
-  TrendingUp,
   Globe,
   DollarSign,
   Target,
-  Users,
   Shield,
   Zap,
   ArrowRight,
@@ -27,6 +28,14 @@ interface ValuePropositionSectionProps {
 
 export const ValuePropositionSection = ({ onNavigate }: ValuePropositionSectionProps) => {
   const { t } = useTranslation();
+  const { stats, loading } = usePlatformStats();
+  const { format } = useLocalizationContext();
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toLocaleString('pt-BR');
+  };
 
   const businessBenefits = [
     {
@@ -113,7 +122,6 @@ export const ValuePropositionSection = ({ onNavigate }: ValuePropositionSectionP
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Benefits List */}
               <div className="space-y-4">
                 {businessBenefits.map((benefit, index) => (
                   <div key={index} className="flex items-start gap-3">
@@ -128,18 +136,30 @@ export const ValuePropositionSection = ({ onNavigate }: ValuePropositionSectionP
                 ))}
               </div>
 
-              {/* Stats */}
+              {/* Stats - Real Data */}
               <div className="grid grid-cols-3 gap-4 py-4 border-y border-border">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">2B+</p>
-                  <p className="text-xs text-muted-foreground">{t('valueProposition.business.stats.users')}</p>
+                  {loading ? <Skeleton className="h-8 w-12 mx-auto" /> : (
+                    <p className="text-2xl font-bold text-primary">
+                      {formatNumber(stats?.overview.total_campaigns || 0)}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">Campanhas</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">180+</p>
-                  <p className="text-xs text-muted-foreground">{t('valueProposition.business.stats.countries')}</p>
+                  {loading ? <Skeleton className="h-8 w-12 mx-auto" /> : (
+                    <p className="text-2xl font-bold text-primary">
+                      {formatNumber(stats?.overview.total_creators || 0)}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">Criadores</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">98%</p>
+                  {loading ? <Skeleton className="h-8 w-12 mx-auto" /> : (
+                    <p className="text-2xl font-bold text-primary">
+                      {stats?.overview.completion_rate || 0}%
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground">{t('valueProposition.business.stats.openRate')}</p>
                 </div>
               </div>
@@ -176,7 +196,6 @@ export const ValuePropositionSection = ({ onNavigate }: ValuePropositionSectionP
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Benefits List */}
               <div className="space-y-4">
                 {creatorBenefits.map((benefit, index) => (
                   <div key={index} className="flex items-start gap-3">
@@ -191,14 +210,22 @@ export const ValuePropositionSection = ({ onNavigate }: ValuePropositionSectionP
                 ))}
               </div>
 
-              {/* Stats */}
+              {/* Stats - Real Data */}
               <div className="grid grid-cols-3 gap-4 py-4 border-y border-border">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-success">$5M+</p>
+                  {loading ? <Skeleton className="h-8 w-16 mx-auto" /> : (
+                    <p className="text-2xl font-bold text-success">
+                      {format(stats?.overview.total_paid_to_creators || 0)}
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground">{t('valueProposition.creator.stats.paid')}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-success">10K+</p>
+                  {loading ? <Skeleton className="h-8 w-12 mx-auto" /> : (
+                    <p className="text-2xl font-bold text-success">
+                      {formatNumber(stats?.overview.total_creators || 0)}
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground">{t('valueProposition.creator.stats.creators')}</p>
                 </div>
                 <div className="text-center">

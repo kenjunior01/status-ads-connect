@@ -3,35 +3,9 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
 import { DollarSign, TrendingUp, Calendar, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-interface EarningsData {
-  month: string;
-  earnings: number;
-  campaigns: number;
-}
-
-interface EarningsChartProps {
-  data?: EarningsData[];
-  totalEarnings?: number;
-  monthlyGrowth?: number;
-}
-
-const defaultData: EarningsData[] = [
-  { month: "Jul", earnings: 420, campaigns: 3 },
-  { month: "Ago", earnings: 680, campaigns: 5 },
-  { month: "Set", earnings: 520, campaigns: 4 },
-  { month: "Out", earnings: 890, campaigns: 6 },
-  { month: "Nov", earnings: 1150, campaigns: 8 },
-  { month: "Dez", earnings: 980, campaigns: 7 },
-  { month: "Jan", earnings: 1420, campaigns: 9 },
-];
-
-const categoryData = [
-  { name: "Beleza", value: 35, color: "hsl(var(--primary))" },
-  { name: "Fitness", value: 25, color: "hsl(var(--success))" },
-  { name: "Tech", value: 20, color: "hsl(var(--warning))" },
-  { name: "Lifestyle", value: 20, color: "hsl(var(--accent))" },
-];
+import { useCampaigns } from "@/hooks/useCampaigns";
+import { useMemo } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const chartConfig = {
   earnings: {
@@ -44,12 +18,86 @@ const chartConfig = {
   },
 };
 
-export const EarningsChart = ({ 
-  data = defaultData, 
-  totalEarnings = 6060, 
-  monthlyGrowth = 45.2 
-}: EarningsChartProps) => {
+const CATEGORY_COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--success))",
+  "hsl(var(--warning))",
+  "hsl(var(--accent))",
+];
+
+export const EarningsChart = () => {
+  const { campaigns, loading } = useCampaigns();
+
+  const { monthlyData, categoryData, totalEarnings, monthlyGrowth } = useMemo(() => {
+    const completed = campaigns.filter(c => c.status === 'completed');
+    const total = completed.reduce((sum, c) => sum + Number(c.price), 0);
+
+    // Group by month
+    const byMonth: Record<string, { earnings: number; campaigns: number }> = {};
+    completed.forEach(c => {
+      const date = c.completed_at ? new Date(c.completed_at) : c.created_at ? new Date(c.created_at) : new Date();
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      if (!byMonth[key]) byMonth[key] = { earnings: 0, campaigns: 0 };
+      byMonth[key].earnings += Number(c.price);
+      byMonth[key].campaigns += 1;
+    });
+
+    const months = Object.keys(byMonth).sort();
+    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const data = months.map(key => {
+      const [, m] = key.split('-');
+      return {
+        month: monthNames[parseInt(m) - 1],
+        earnings: byMonth[key].earnings,
+        campaigns: byMonth[key].campaigns,
+      };
+    });
+
+    // Growth
+    let growth = 0;
+    if (data.length >= 2) {
+      const last = data[data.length - 1].earnings;
+      const prev = data[data.length - 2].earnings;
+      growth = prev > 0 ? ((last - prev) / prev) * 100 : 0;
+    }
+
+    // Category distribution from campaign titles/descriptions (simple heuristic)
+    const categories: Record<string, number> = {};
+    campaigns.forEach(c => {
+      const text = `${c.title} ${c.description || ''}`.toLowerCase();
+      if (text.match(/beleza|beauty|moda|fashion/)) categories['Beleza'] = (categories['Beleza'] || 0) + 1;
+      else if (text.match(/fitness|saúde|health|gym/)) categories['Fitness'] = (categories['Fitness'] || 0) + 1;
+      else if (text.match(/tech|tecnologia|app|software/)) categories['Tech'] = (categories['Tech'] || 0) + 1;
+      else categories['Outros'] = (categories['Outros'] || 0) + 1;
+    });
+    const totalCats = Object.values(categories).reduce((a, b) => a + b, 0) || 1;
+    const catData = Object.entries(categories).map(([name, count], i) => ({
+      name,
+      value: Math.round((count / totalCats) * 100),
+      color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+    }));
+
+    return {
+      monthlyData: data,
+      categoryData: catData.length > 0 ? catData : [{ name: 'Sem dados', value: 100, color: CATEGORY_COLORS[0] }],
+      totalEarnings: total,
+      monthlyGrowth: Math.round(growth * 10) / 10,
+    };
+  }, [campaigns]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => <Skeleton key={i} className="h-28" />)}
+        </div>
+        <Skeleton className="h-[360px]" />
+      </div>
+    );
+  }
+
   const isPositiveGrowth = monthlyGrowth > 0;
+  const totalCampaigns = campaigns.length;
 
   return (
     <div className="space-y-6">
@@ -76,10 +124,12 @@ export const EarningsChart = ({
                 <p className="text-sm text-muted-foreground">Crescimento Mensal</p>
                 <div className="flex items-center gap-2">
                   <p className="text-2xl font-bold">{Math.abs(monthlyGrowth)}%</p>
-                  <Badge variant={isPositiveGrowth ? "default" : "destructive"} className="flex items-center gap-1">
-                    {isPositiveGrowth ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                    {isPositiveGrowth ? "Alta" : "Baixa"}
-                  </Badge>
+                  {monthlyData.length >= 2 && (
+                    <Badge variant={isPositiveGrowth ? "default" : "destructive"} className="flex items-center gap-1">
+                      {isPositiveGrowth ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                      {isPositiveGrowth ? "Alta" : "Baixa"}
+                    </Badge>
+                  )}
                 </div>
               </div>
               <div className="bg-success/20 p-3 rounded-full">
@@ -94,7 +144,7 @@ export const EarningsChart = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Campanhas</p>
-                <p className="text-2xl font-bold">{data.reduce((acc, d) => acc + d.campaigns, 0)}</p>
+                <p className="text-2xl font-bold">{totalCampaigns}</p>
               </div>
               <div className="bg-warning/20 p-3 rounded-full">
                 <Calendar className="h-6 w-6 text-warning" />
@@ -105,58 +155,21 @@ export const EarningsChart = ({
       </div>
 
       {/* Main Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Histórico de Ganhos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis 
-                  dataKey="month" 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
-                  tickFormatter={(value) => `R$${value}`}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area
-                  type="monotone"
-                  dataKey="earnings"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorEarnings)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </CardContent>
-      </Card>
-
-      {/* Secondary Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Campaigns per Month */}
+      {monthlyData.length > 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>Campanhas por Mês</CardTitle>
+            <CardTitle>Histórico de Ganhos</CardTitle>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[200px]">
+            <ChartContainer config={chartConfig} className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
+                <AreaChart data={monthlyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
                   <XAxis 
                     dataKey="month" 
                     axisLine={false}
@@ -167,23 +180,68 @@ export const EarningsChart = ({
                     axisLine={false}
                     tickLine={false}
                     tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    tickFormatter={(value) => `R$${value}`}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar 
-                    dataKey="campaigns" 
-                    fill="hsl(var(--success))" 
-                    radius={[4, 4, 0, 0]}
+                  <Area
+                    type="monotone"
+                    dataKey="earnings"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorEarnings)"
                   />
-                </BarChart>
+                </AreaChart>
               </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
+      ) : (
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground">Nenhum dado de ganhos ainda. Complete campanhas para ver o histórico.</p>
+        </Card>
+      )}
+
+      {/* Secondary Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Campaigns per Month */}
+        {monthlyData.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Campanhas por Mês</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyData}>
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar 
+                      dataKey="campaigns" 
+                      fill="hsl(var(--success))" 
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Earnings by Category */}
         <Card>
           <CardHeader>
-            <CardTitle>Ganhos por Categoria</CardTitle>
+            <CardTitle>Distribuição por Categoria</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center">

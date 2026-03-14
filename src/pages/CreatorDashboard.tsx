@@ -77,8 +77,8 @@ export const CreatorDashboard = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" trend={{ value: 12.5, isPositive: true }} />
-          <MetricsCard title="Este Mês" value={`R$ ${monthlyEarnings.toFixed(2)}`} icon={TrendingUp} variant="primary" trend={{ value: 8.3, isPositive: true }} />
+          <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" />
+          <MetricsCard title="Este Mês" value={`R$ ${monthlyEarnings.toFixed(2)}`} icon={TrendingUp} variant="primary" />
           <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="warning" subtitle="Em andamento" />
           <MetricsCard title="Avaliação Média" value={profile?.rating || 0} icon={Star} variant="default" subtitle={`${profile?.total_reviews || 0} avaliações`} />
         </div>
@@ -100,7 +100,7 @@ export const CreatorDashboard = () => {
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Award className="h-5 w-5" />Performance</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center"><span className="text-sm">Taxa de Resposta</span><span className="font-semibold text-success">96%</span></div>
+                  <div className="flex justify-between items-center"><span className="text-sm">Taxa de Conclusão</span><span className="font-semibold text-success">{completedCampaigns.length > 0 ? Math.round((completedCampaigns.length / campaigns.length) * 100) : 0}%</span></div>
                   <div className="flex justify-between items-center"><span className="text-sm">Campanhas Concluídas</span><span className="font-semibold">{completedCampaigns.length}</span></div>
                   <div className="flex justify-between items-center"><span className="text-sm">Visualizações do Perfil</span><span className="font-semibold">{profile?.total_campaigns || 0}</span></div>
                 </CardContent>
