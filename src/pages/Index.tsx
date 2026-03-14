@@ -8,6 +8,7 @@ import { AdvancedFiltersSidebar, MobileFiltersSheet, FilterState } from "@/compo
 import { SocialProof } from "@/components/TrustIndicators";
 import { FloatingCTA } from "@/components/EnhancedCTA";
 import { ValuePropositionSection } from "@/components/ValuePropositionSection";
+import { TrustStatsBar } from "@/components/TrustStatsBar";
 import { CreatorProfile } from "@/pages/CreatorProfile";
 import { useProfiles } from "@/hooks/useProfiles";
 import { useFavorites } from "@/hooks/useFavorites";
