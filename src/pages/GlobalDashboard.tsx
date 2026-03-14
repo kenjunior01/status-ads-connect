@@ -77,28 +77,7 @@ const AnimatedNumber = ({ value, prefix = "", suffix = "" }: { value: number; pr
 };
 
 export const GlobalDashboard = () => {
-  const [stats, setStats] = useState<PlatformStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const { data, error: fnError } = await supabase.functions.invoke("platform-stats");
-        if (fnError) throw fnError;
-        if (data?.error) throw new Error(data.error);
-        setStats(data);
-      } catch (err: any) {
-        setError(err.message || "Erro ao carregar estatísticas");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStats();
-    // Refresh every 60s
-    const interval = setInterval(fetchStats, 60000);
-    return () => clearInterval(interval);
-  }, []);
+  const { stats, loading, error } = usePlatformStats();
 
   if (loading) {
     return (
