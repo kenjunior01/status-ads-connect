@@ -150,4 +150,9 @@
     min-height: 44px;
     min-width: 44px;
   }
+  
+  /* Safe area for bottom navigation on iOS */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 }

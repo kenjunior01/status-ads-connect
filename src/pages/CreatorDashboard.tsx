@@ -10,6 +10,7 @@ import { MetricsCard } from "@/components/MetricsCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { EarningsChart } from "@/components/EarningsChart";
+import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import { NotificationButton } from "@/components/NotificationsPanel";
 import { ProofUploadForm } from "@/components/ProofUploadForm";
 import { VerificationBadge } from "@/components/VerificationBadge";
