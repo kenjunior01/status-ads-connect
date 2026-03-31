@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navigation } from "@/components/Navigation";
+import { BottomNavigation } from "@/components/BottomNavigation";
+import { PageTransition } from "@/components/PageTransition";
 import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -49,9 +51,12 @@ function App() {
           <Sonner />
           <div className="min-h-screen bg-background">
             <Navigation onNavigate={setCurrentPage} currentPage={currentPage} />
-            <main>
-              {renderPage()}
+            <main className="pb-20 md:pb-0">
+              <PageTransition pageKey={currentPage}>
+                {renderPage()}
+              </PageTransition>
             </main>
+            <BottomNavigation onNavigate={setCurrentPage} currentPage={currentPage} />
           </div>
         </TooltipProvider>
       </LocalizationProvider>

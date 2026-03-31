@@ -10,6 +10,7 @@ import { MetricsCard } from "@/components/MetricsCard";
 import { CampaignCard } from "@/components/CampaignCard";
 import { ProfileEditForm } from "@/components/ProfileEditForm";
 import { EarningsChart } from "@/components/EarningsChart";
+import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 import { NotificationButton } from "@/components/NotificationsPanel";
 import { ProofUploadForm } from "@/components/ProofUploadForm";
 import { VerificationBadge } from "@/components/VerificationBadge";
@@ -52,14 +53,7 @@ export const CreatorDashboard = () => {
     .reduce((sum, c) => sum + Number(c.price), 0);
 
   if (profileLoading || campaignsLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">Carregando seu painel...</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
