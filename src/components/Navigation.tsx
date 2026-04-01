@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { RegionCurrencySelector } from "@/components/RegionCurrencySelector";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
@@ -109,7 +110,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -152,6 +153,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
 
           {/* Auth Buttons & Language */}
           <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <RegionCurrencySelector />
             <LanguageSelector />
             {user ? (
@@ -180,7 +182,8 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
           </div>
 
           {/* Mobile Menu */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1">
+            <ThemeToggle />
             <RegionCurrencySelector />
             <LanguageSelector />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
