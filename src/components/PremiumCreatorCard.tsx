@@ -62,8 +62,8 @@ export const PremiumCreatorCard = ({
   const isTopRated = profile.rating >= 4.5 && profile.total_reviews >= 3;
   const avatarGradient = getAvatarGradient(profile.display_name);
   
-  // Calculate response rate (mock - would come from real data)
-  const responseRate = 85 + Math.floor(Math.random() * 15);
+  // Remove mock response rate - show only if real data available
+  const responseRate = null; // Would come from real profile data
   
   // Parse price from price_range string or use default
   const getBasePrice = () => {
