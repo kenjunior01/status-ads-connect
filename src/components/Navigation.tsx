@@ -2,21 +2,16 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { 
-  Home, 
   LayoutDashboard, 
-  Target, 
-  Star,
   Menu,
   LogIn,
   UserPlus,
-  Search,
-  BarChart3
+  LogOut,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { RegionCurrencySelector } from "@/components/RegionCurrencySelector";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -34,9 +29,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      }
+      if (session?.user) fetchUserRole(session.user.id);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -71,39 +64,6 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
     return 'creator-dashboard';
   };
 
-  const menuItems = [
-    {
-      title: t('navigation.home'),
-      icon: Home,
-      page: "index",
-      description: t('navigation.home')
-    },
-    {
-      title: t('navigation.explore'),
-      icon: Search,
-      page: "creators",
-      description: t('navigation.explore')
-    },
-    {
-      title: "Dashboard Global",
-      icon: BarChart3,
-      page: "global-dashboard",
-      description: "Métricas da rede"
-    },
-    {
-      title: t('navigation.creators'),
-      icon: Star,
-      page: "creator-dashboard", 
-      description: t('navigation.creators')
-    },
-    {
-      title: t('navigation.advertisers'),
-      icon: Target,
-      page: "advertiser-dashboard",
-      description: t('navigation.advertisers')
-    }
-  ];
-
   const handleNavigation = (page: string) => {
     onNavigate(page);
     setMobileOpen(false);
@@ -112,115 +72,74 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-14 items-center justify-between">
           {/* Logo */}
           <div 
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => handleNavigation("index")}
           >
-            <div className="bg-gradient-primary p-2 rounded-lg">
-              <LayoutDashboard className="h-5 w-5 text-primary-foreground" />
+            <div className="bg-gradient-primary p-1.5 rounded-lg">
+              <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
-            <div>
-              <div className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
-                StatusAds
-              </div>
-            </div>
+            <span className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
+              StatusAds
+            </span>
           </div>
 
-          {/* Desktop Navigation - Simplified */}
-          <div className="hidden md:flex items-center space-x-1">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentPage === item.page;
-              return (
-                <Button
-                  key={item.page}
-                  variant={isActive ? "secondary" : "ghost"}
-                  size="sm"
-                  className={cn(
-                    "gap-2",
-                    isActive && "bg-primary/10 text-primary"
-                  )}
-                  onClick={() => handleNavigation(item.page)}
-                >
-                  <Icon className="h-4 w-4" />
-                  {item.title}
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Auth Buttons & Language */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop Right Actions */}
+          <div className="hidden md:flex items-center gap-1.5">
             <ThemeToggle />
-            <RegionCurrencySelector />
-            <LanguageSelector />
             {user ? (
               <>
-                <Button variant="ghost" size="sm" onClick={() => onNavigate(getDashboardPage())}>
-                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                <Button 
+                  variant={currentPage.includes('dashboard') ? 'secondary' : 'ghost'} 
+                  size="sm" 
+                  onClick={() => handleNavigation(getDashboardPage())}
+                  className="gap-1.5"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Sair
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-muted-foreground">
+                  <LogOut className="h-4 w-4" />
+                  {t('navigation.logout') || 'Sair'}
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => onNavigate('auth')}>
-                  <LogIn className="h-4 w-4 mr-2" />
+                <Button variant="ghost" size="sm" onClick={() => handleNavigation('auth')} className="gap-1.5">
+                  <LogIn className="h-4 w-4" />
                   {t('navigation.login')}
                 </Button>
-                <Button size="sm" className="bg-gradient-primary hover:opacity-90" onClick={() => onNavigate('auth')}>
-                  <UserPlus className="h-4 w-4 mr-2" />
+                <Button size="sm" className="bg-gradient-primary hover:opacity-90 gap-1.5" onClick={() => handleNavigation('auth')}>
+                  <UserPlus className="h-4 w-4" />
                   {t('navigation.register')}
                 </Button>
               </>
             )}
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobile */}
           <div className="flex md:hidden items-center gap-1">
             <ThemeToggle />
-            <RegionCurrencySelector />
-            <LanguageSelector />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="px-2">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px]">
+              <SheetContent side="right" className="w-[260px]">
                 <div className="flex flex-col space-y-2 mt-8">
-                  {menuItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Button
-                        key={item.page}
-                        variant={currentPage === item.page ? "default" : "ghost"}
-                        className="justify-start h-12"
-                        onClick={() => handleNavigation(item.page)}
-                      >
-                        <Icon className="h-5 w-5 mr-3" />
-                        <div className="text-left">
-                          <div className="font-medium">{item.title}</div>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                  
-                  <div className="pt-4 border-t space-y-2">
+                  <div className="pb-4 border-b space-y-2">
                     {user ? (
                       <>
-                        <Button variant="outline" className="w-full justify-start" onClick={() => handleNavigation(getDashboardPage())}>
+                        <Button variant="default" className="w-full justify-start" onClick={() => handleNavigation(getDashboardPage())}>
                           <LayoutDashboard className="h-4 w-4 mr-2" />
                           Dashboard
                         </Button>
-                        <Button variant="destructive" className="w-full justify-start" onClick={handleLogout}>
-                          <LogIn className="h-4 w-4 mr-2" />
-                          Sair
+                        <Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={handleLogout}>
+                          <LogOut className="h-4 w-4 mr-2" />
+                          {t('navigation.logout') || 'Sair'}
                         </Button>
                       </>
                     ) : (

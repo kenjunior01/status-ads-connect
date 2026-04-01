@@ -12,10 +12,9 @@ interface BottomNavigationProps {
 
 const navItems = [
   { key: "index", icon: Home, labelKey: "navigation.home" },
-  { key: "creators", icon: Search, labelKey: "navigation.explore" },
-  { key: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { key: "messages", icon: MessageCircle, label: "Mensagens" },
-  { key: "profile", icon: User, label: "Perfil" },
+  { key: "dashboard", icon: LayoutDashboard, labelKey: "navigation.dashboard" },
+  { key: "messages", icon: MessageCircle, labelKey: "navigation.messages" },
+  { key: "profile", icon: User, labelKey: "navigation.profile" },
 ];
 
 export const BottomNavigation = ({ onNavigate, currentPage }: BottomNavigationProps) => {
@@ -47,20 +46,17 @@ export const BottomNavigation = ({ onNavigate, currentPage }: BottomNavigationPr
 
   const isActive = (key: string) => {
     if (key === 'index') return currentPage === 'index';
-    if (key === 'creators') return currentPage === 'creators';
     if (key === 'dashboard') return currentPage.includes('dashboard');
-    if (key === 'messages') return false;
-    if (key === 'profile') return false;
     return false;
   };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border/40 bg-background/95 backdrop-blur-lg supports-[backdrop-filter]:bg-background/80">
-      <div className="flex items-center justify-around h-16 px-2 safe-area-bottom">
+      <div className="flex items-center justify-around h-14 px-2 safe-area-bottom">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.key);
-          const label = item.labelKey ? t(item.labelKey) : item.label;
+          const label = t(item.labelKey) || item.key;
 
           return (
             <button
