@@ -153,6 +153,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
 
           {/* Auth Buttons & Language */}
           <div className="hidden md:flex items-center gap-2">
+            <ThemeToggle />
             <RegionCurrencySelector />
             <LanguageSelector />
             {user ? (
