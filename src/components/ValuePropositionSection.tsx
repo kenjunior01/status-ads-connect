@@ -177,7 +177,7 @@ export const ValuePropositionSection = ({ onNavigate }: ValuePropositionSectionP
           </Card>
 
           {/* For Individuals/Creators */}
-          <Card className="relative overflow-hidden border-2 hover:border-success/50 transition-colors">
+          <Card className="relative overflow-hidden border-2 glass hover:border-success/50 hover:glow-success transition-all duration-300">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-success/10 to-transparent" />
             <CardHeader className="pb-4">
               <div className="flex items-center gap-3 mb-2">

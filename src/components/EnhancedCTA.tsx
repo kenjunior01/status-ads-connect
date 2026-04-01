@@ -119,7 +119,7 @@ export const FloatingCTA = ({ show, variant = 'creator', onClick }: FloatingCTAP
   if (!show) return null;
 
   const text = variant === 'creator' 
-    ? "💰 Ganhe R$ 500+ por mês" 
+    ? "💰 Comece a monetizar agora" 
     : "🎯 Encontre Criadores Agora";
 
   return (

@@ -35,7 +35,7 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
     <div className="w-full max-w-3xl mx-auto">
       {/* Main Search Bar */}
       <div className="relative">
-        <div className="flex items-center bg-white rounded-2xl shadow-strong overflow-hidden border-2 border-transparent focus-within:border-primary transition-colors">
+        <div className="flex items-center bg-card rounded-2xl shadow-strong overflow-hidden border-2 border-transparent focus-within:border-primary transition-colors glass-strong">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input

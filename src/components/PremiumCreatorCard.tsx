@@ -177,10 +177,12 @@ export const PremiumCreatorCard = ({
             <Eye className="h-3 w-3" />
             <span>{profile.total_campaigns} campanhas</span>
           </div>
-          <div className="flex items-center gap-1">
-            <MessageCircle className="h-3 w-3" />
-            <span>{responseRate}% resposta</span>
-          </div>
+          {responseRate && (
+            <div className="flex items-center gap-1">
+              <MessageCircle className="h-3 w-3" />
+              <span>{responseRate}% resposta</span>
+            </div>
+          )}
         </div>
 
         {/* Divider */}
