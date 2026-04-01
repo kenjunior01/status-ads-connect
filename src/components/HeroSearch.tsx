@@ -74,15 +74,15 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
         ))}
       </div>
 
-      {/* Stats Pills */}
+      {/* Stats Pills - using real data would require usePlatformStats */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         <div className="flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full">
           <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-          <span className="text-sm font-medium">2.5k+ {t('hero.stats.creators').toLowerCase()}</span>
+          <span className="text-sm font-medium">{t('hero.stats.creators').toLowerCase()}</span>
         </div>
         <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
           <Zap className="h-4 w-4" />
-          <span className="text-sm font-medium">{t('creator.responseTime')} &lt; 1h</span>
+          <span className="text-sm font-medium">{t('creator.responseTime')}</span>
         </div>
       </div>
     </div>
