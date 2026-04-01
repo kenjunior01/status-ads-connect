@@ -81,9 +81,9 @@ export const PremiumCreatorCard = ({
     <Card 
       className={cn(
         "group relative overflow-hidden cursor-pointer transition-all duration-300",
-        "bg-card border-border hover:border-primary/30",
-        "hover:shadow-strong hover:-translate-y-1",
-        variant === "featured" && "ring-2 ring-primary/20",
+        "glass border-border/40 hover:border-primary/30",
+        "hover:shadow-glow hover:-translate-y-1",
+        variant === "featured" && "ring-2 ring-primary/20 glow-primary",
         className
       )}
       onClick={() => onSelect?.(profile)}
