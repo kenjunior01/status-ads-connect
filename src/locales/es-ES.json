@@ -40,7 +40,8 @@
     "logout": "Cerrar Sesión",
     "settings": "Configuración",
     "profile": "Perfil",
-    "dashboard": "Panel"
+    "dashboard": "Panel",
+    "messages": "Mensajes"
   },
   "hero": {
     "title": "Monetiza tu Estado de WhatsApp",

@@ -40,7 +40,8 @@
     "logout": "Logout",
     "settings": "Settings",
     "profile": "Profile",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "messages": "Messages"
   },
   "hero": {
     "title": "Monetize your WhatsApp Status",
