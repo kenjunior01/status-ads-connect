@@ -47,7 +47,7 @@ export const MetricsCard = ({
   className 
 }: MetricsCardProps) => {
   return (
-    <Card className={cn(variantStyles[variant], "hover:shadow-subtle transition-shadow", className)}>
+    <Card className={cn("glass hover:glow-primary transition-all duration-300", className)}>
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">

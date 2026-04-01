@@ -91,8 +91,8 @@ export const CampaignCard = ({
 
   return (
     <Card className={cn(
-      "hover:shadow-elegant transition-all duration-300 group",
-      isActive && "ring-1 ring-success/20",
+      "glass hover:shadow-glow transition-all duration-300 group",
+      isActive && "ring-1 ring-success/20 glow-success",
       className
     )}>
       <CardContent className="p-6">

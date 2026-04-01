@@ -13,7 +13,7 @@ export const EnhancedCTA = ({ variant = 'hero', onClick, className }: EnhancedCT
   const configs = {
     creator: {
       primary: {
-        text: "Ganhe R$ 500+ por mês",
+        text: "Comece a monetizar",
         subtitle: "Comece a monetizar agora",
         icon: DollarSign,
         gradient: "bg-gradient-success"
@@ -119,7 +119,7 @@ export const FloatingCTA = ({ show, variant = 'creator', onClick }: FloatingCTAP
   if (!show) return null;
 
   const text = variant === 'creator' 
-    ? "💰 Ganhe R$ 500+ por mês" 
+    ? "💰 Comece a monetizar agora" 
     : "🎯 Encontre Criadores Agora";
 
   return (

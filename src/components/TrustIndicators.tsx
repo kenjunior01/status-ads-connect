@@ -43,7 +43,7 @@ export const TrustIndicators = ({ className }: TrustIndicatorsProps) => {
         return (
           <div
             key={index}
-            className="flex flex-col items-center text-center p-4 bg-card rounded-lg border border-border hover:border-primary/50 transition-colors"
+            className="flex flex-col items-center text-center p-4 glass rounded-lg hover:glow-primary transition-all duration-300"
           >
             <div className="bg-primary/10 p-3 rounded-full mb-2">
               <Icon className="h-5 w-5 text-primary" />

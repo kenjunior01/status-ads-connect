@@ -62,8 +62,8 @@ export const PremiumCreatorCard = ({
   const isTopRated = profile.rating >= 4.5 && profile.total_reviews >= 3;
   const avatarGradient = getAvatarGradient(profile.display_name);
   
-  // Calculate response rate (mock - would come from real data)
-  const responseRate = 85 + Math.floor(Math.random() * 15);
+  // Remove mock response rate - show only if real data available
+  const responseRate = null; // Would come from real profile data
   
   // Parse price from price_range string or use default
   const getBasePrice = () => {
@@ -81,9 +81,9 @@ export const PremiumCreatorCard = ({
     <Card 
       className={cn(
         "group relative overflow-hidden cursor-pointer transition-all duration-300",
-        "bg-card border-border hover:border-primary/30",
-        "hover:shadow-strong hover:-translate-y-1",
-        variant === "featured" && "ring-2 ring-primary/20",
+        "glass border-border/40 hover:border-primary/30",
+        "hover:shadow-glow hover:-translate-y-1",
+        variant === "featured" && "ring-2 ring-primary/20 glow-primary",
         className
       )}
       onClick={() => onSelect?.(profile)}
@@ -177,10 +177,12 @@ export const PremiumCreatorCard = ({
             <Eye className="h-3 w-3" />
             <span>{profile.total_campaigns} campanhas</span>
           </div>
-          <div className="flex items-center gap-1">
-            <MessageCircle className="h-3 w-3" />
-            <span>{responseRate}% resposta</span>
-          </div>
+          {responseRate && (
+            <div className="flex items-center gap-1">
+              <MessageCircle className="h-3 w-3" />
+              <span>{responseRate}% resposta</span>
+            </div>
+          )}
         </div>
 
         {/* Divider */}

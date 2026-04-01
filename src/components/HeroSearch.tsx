@@ -35,7 +35,7 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
     <div className="w-full max-w-3xl mx-auto">
       {/* Main Search Bar */}
       <div className="relative">
-        <div className="flex items-center bg-white rounded-2xl shadow-strong overflow-hidden border-2 border-transparent focus-within:border-primary transition-colors">
+        <div className="flex items-center bg-card rounded-2xl shadow-strong overflow-hidden border-2 border-transparent focus-within:border-primary transition-colors glass-strong">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
@@ -74,15 +74,15 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
         ))}
       </div>
 
-      {/* Stats Pills */}
+      {/* Stats Pills - using real data would require usePlatformStats */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         <div className="flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full">
           <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-          <span className="text-sm font-medium">2.5k+ {t('hero.stats.creators').toLowerCase()}</span>
+          <span className="text-sm font-medium">{t('hero.stats.creators').toLowerCase()}</span>
         </div>
         <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
           <Zap className="h-4 w-4" />
-          <span className="text-sm font-medium">{t('creator.responseTime')} &lt; 1h</span>
+          <span className="text-sm font-medium">{t('creator.responseTime')}</span>
         </div>
       </div>
     </div>
