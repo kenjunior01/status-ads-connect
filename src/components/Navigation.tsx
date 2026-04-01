@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { RegionCurrencySelector } from "@/components/RegionCurrencySelector";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
