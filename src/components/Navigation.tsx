@@ -182,7 +182,8 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
           </div>
 
           {/* Mobile Menu */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1">
+            <ThemeToggle />
             <RegionCurrencySelector />
             <LanguageSelector />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
