@@ -71,67 +71,63 @@
   }
 
   .dark {
-    /* Premium Dark Mode — Deep Space aesthetic */
-    --background: 225 25% 6%;
-    --foreground: 220 20% 92%;
+    /* WhatsApp Dark Mode */
+    --background: 200 18% 8%;
+    --foreground: 140 10% 90%;
 
-    --card: 225 20% 9%;
-    --card-foreground: 220 20% 92%;
+    --card: 200 15% 11%;
+    --card-foreground: 140 10% 90%;
 
-    --popover: 225 22% 8%;
-    --popover-foreground: 220 20% 92%;
+    --popover: 200 16% 10%;
+    --popover-foreground: 140 10% 90%;
 
-    /* Primary: Electric Blue — neon trust */
-    --primary: 217 91% 60%;
+    /* Primary: WhatsApp Teal-Green in dark */
+    --primary: 152 62% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
-    --primary-glow: 217 91% 70%;
+    --primary-hover: 152 62% 40%;
+    --primary-glow: 152 62% 55%;
 
-    --secondary: 225 18% 14%;
-    --secondary-foreground: 220 20% 88%;
+    --secondary: 200 12% 15%;
+    --secondary-foreground: 140 10% 85%;
 
-    /* Success: Neon Green */
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
     --success-glow: 142 71% 55%;
 
-    /* Warning: Amber glow */
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    /* Accent: Electric Purple */
-    --accent: 262 83% 58%;
+    /* Accent: Lighter teal */
+    --accent: 168 60% 42%;
     --accent-foreground: 0 0% 100%;
 
-    --muted: 225 15% 15%;
-    --muted-foreground: 220 10% 55%;
+    --muted: 200 12% 16%;
+    --muted-foreground: 140 8% 55%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 225 15% 16%;
-    --input: 225 15% 14%;
-    --ring: 217 91% 60%;
+    --border: 200 12% 18%;
+    --input: 200 12% 15%;
+    --ring: 152 62% 45%;
 
-    /* Dark gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(262 83% 58%));
+    --gradient-primary: linear-gradient(135deg, hsl(152 62% 45%), hsl(168 60% 42%));
     --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(160 84% 39%));
-    --gradient-hero: linear-gradient(135deg, hsl(225 25% 6%), hsl(225 30% 12%));
+    --gradient-hero: linear-gradient(135deg, hsl(200 18% 8%), hsl(200 20% 14%));
 
-    /* Dark shadows with glow */
     --shadow-soft: 0 1px 3px -1px hsl(0 0% 0% / 0.3);
     --shadow-medium: 0 4px 12px -2px hsl(0 0% 0% / 0.4);
     --shadow-strong: 0 8px 24px -4px hsl(0 0% 0% / 0.5);
-    --shadow-glow: 0 0 30px hsl(217 91% 60% / 0.2);
+    --shadow-glow: 0 0 24px hsl(152 62% 45% / 0.15);
 
-    --sidebar-background: 225 22% 8%;
-    --sidebar-foreground: 220 20% 88%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-background: 200 16% 10%;
+    --sidebar-foreground: 140 10% 85%;
+    --sidebar-primary: 152 62% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 18% 14%;
-    --sidebar-accent-foreground: 220 20% 88%;
-    --sidebar-border: 225 15% 16%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-accent: 200 12% 15%;
+    --sidebar-accent-foreground: 140 10% 85%;
+    --sidebar-border: 200 12% 18%;
+    --sidebar-ring: 152 62% 45%;
   }
 }
 
