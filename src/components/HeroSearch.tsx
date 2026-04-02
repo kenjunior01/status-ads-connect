@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
+import { Search, Flame, TrendingUp, Palette, Shirt } from "lucide-react";
 
 interface HeroSearchProps {
   onSearch?: (query: string) => void;
