@@ -15,17 +15,18 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { 
   Users, 
-  MessageSquare, 
-  DollarSign, 
+  MessageCircle, 
+  Banknote, 
   Star, 
-  Shield,
+  ShieldCheck,
   Award,
   Zap,
-  Globe,
+  Globe2,
   ArrowRight,
   ChevronDown,
   Heart,
-  Sparkles
+  Sparkles,
+  CircleDot
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -222,27 +223,25 @@ const Index = ({ onNavigate }: IndexProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background wa-bg-pattern">
       {/* Hero Section with Search */}
-      <section className="relative py-16 px-4 bg-gradient-hero overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+      <section className="relative py-12 px-4 bg-gradient-hero overflow-hidden">
+        {/* Floating circles */}
+        <div className="absolute top-10 left-[10%] w-32 h-32 bg-primary-foreground/5 rounded-full blur-2xl animate-float" />
+        <div className="absolute bottom-10 right-[15%] w-48 h-48 bg-primary-foreground/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-primary-foreground/3 rounded-full blur-xl animate-float" style={{ animationDelay: '0.8s' }} />
         
         <div className="relative z-10 max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full mb-6">
-            <Globe className="h-4 w-4" />
-            <span className="text-sm font-medium">{t('global.platform')}</span>
+          <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm text-primary-foreground px-3 py-1.5 rounded-full mb-4">
+            <Globe2 className="h-3.5 w-3.5" />
+            <span className="text-xs font-medium">{t('global.platform')}</span>
           </div>
           
-          {/* Headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-3">
             {t('hero.title')}
           </h1>
           
-          <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-primary-foreground/75 mb-8 max-w-2xl mx-auto">
             {t('hero.subtitle')}
           </p>
           
@@ -319,7 +318,7 @@ const Index = ({ onNavigate }: IndexProps) => {
             <div className="flex-1">
               {displayProfiles.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 md:gap-3">
                     {displayProfiles.map((profile, index) => (
                       <PremiumCreatorCard 
                         key={profile.id} 
@@ -392,25 +391,26 @@ const Index = ({ onNavigate }: IndexProps) => {
       <ValuePropositionSection onNavigate={onNavigate} />
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 bg-gradient-hero text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <section className="py-16 px-4 bg-gradient-hero text-primary-foreground relative overflow-hidden">
+        <div className="absolute top-5 right-[20%] w-32 h-32 bg-primary-foreground/5 rounded-full blur-2xl animate-float" />
+        <div className="absolute bottom-5 left-[10%] w-40 h-40 bg-primary-foreground/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-            <Globe className="h-4 w-4" />
-            <span className="text-sm">{t('valueProposition.trustedBy')}</span>
+          <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm px-3 py-1.5 rounded-full mb-4">
+            <Globe2 className="h-3.5 w-3.5" />
+            <span className="text-xs">{t('valueProposition.trustedBy')}</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             {t('valueProposition.creator.title')}
           </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-primary-foreground/75 mb-6 max-w-2xl mx-auto">
             {t('valueProposition.creator.description')}
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-white/90 gap-2 px-8"
+              className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 px-6"
               onClick={() => onNavigate?.('auth')}
             >
               {t('valueProposition.creator.cta')}
@@ -419,7 +419,7 @@ const Index = ({ onNavigate }: IndexProps) => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-white/30 text-white hover:bg-white/10"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
               onClick={() => onNavigate?.('advertiser-dashboard')}
             >
               {t('valueProposition.business.cta')}
@@ -433,10 +433,8 @@ const Index = ({ onNavigate }: IndexProps) => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-primary p-2.5 rounded-xl">
-                  <Globe className="h-5 w-5 text-white" />
-                </div>
+              <div className="flex items-center space-x-2 mb-4">
+                <CircleDot className="h-5 w-5 text-primary" />
                 <span className="text-lg font-bold">StatusAds</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">

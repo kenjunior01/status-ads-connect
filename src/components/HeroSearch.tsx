@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
+import { Search, Flame, TrendingUp, Palette, Shirt } from "lucide-react";
 
 interface HeroSearchProps {
   onSearch?: (query: string) => void;
@@ -15,10 +15,10 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const popularCategories = [
-    { label: t('niches.lifestyle'), icon: Sparkles, value: "lifestyle" },
+    { label: t('niches.lifestyle'), icon: Flame, value: "lifestyle" },
     { label: t('niches.fitness'), icon: TrendingUp, value: "fitness" },
-    { label: t('niches.tech'), icon: Zap, value: "tech" },
-    { label: t('niches.beauty'), icon: Users, value: "beauty" },
+    { label: t('niches.tech'), icon: Palette, value: "tech" },
+    { label: t('niches.beauty'), icon: Shirt, value: "beauty" },
   ];
 
   const handleSearch = () => {
@@ -75,14 +75,10 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
       </div>
 
       {/* Stats Pills - using real data would require usePlatformStats */}
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-        <div className="flex items-center gap-2 bg-success/10 text-success px-4 py-2 rounded-full">
-          <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-          <span className="text-sm font-medium">{t('hero.stats.creators').toLowerCase()}</span>
-        </div>
-        <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
-          <Zap className="h-4 w-4" />
-          <span className="text-sm font-medium">{t('creator.responseTime')}</span>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="flex items-center gap-2 bg-success/10 text-success px-3 py-1.5 rounded-full">
+          <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse" />
+          <span className="text-xs font-medium">{t('hero.stats.creators').toLowerCase()}</span>
         </div>
       </div>
     </div>

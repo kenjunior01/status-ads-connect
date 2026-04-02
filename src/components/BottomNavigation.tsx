@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Home, Search, LayoutDashboard, MessageCircle, User } from "lucide-react";
+import { Home, LayoutGrid, MessageCircle, CircleUser } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,9 +12,9 @@ interface BottomNavigationProps {
 
 const navItems = [
   { key: "index", icon: Home, labelKey: "navigation.home" },
-  { key: "dashboard", icon: LayoutDashboard, labelKey: "navigation.dashboard" },
+  { key: "dashboard", icon: LayoutGrid, labelKey: "navigation.dashboard" },
   { key: "messages", icon: MessageCircle, labelKey: "navigation.messages" },
-  { key: "profile", icon: User, labelKey: "navigation.profile" },
+  { key: "profile", icon: CircleUser, labelKey: "navigation.profile" },
 ];
 
 export const BottomNavigation = ({ onNavigate, currentPage }: BottomNavigationProps) => {
@@ -51,8 +51,8 @@ export const BottomNavigation = ({ onNavigate, currentPage }: BottomNavigationPr
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border/40 bg-background/95 backdrop-blur-lg supports-[backdrop-filter]:bg-background/80">
-      <div className="flex items-center justify-around h-14 px-2 safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-border/30 bg-background/95 backdrop-blur-lg">
+      <div className="flex items-center justify-around h-14 px-1 safe-area-bottom">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.key);
@@ -71,11 +71,11 @@ export const BottomNavigation = ({ onNavigate, currentPage }: BottomNavigationPr
                 {active && (
                   <motion.div
                     layoutId="bottomNavIndicator"
-                    className="absolute -inset-2 rounded-xl bg-primary/10"
+                    className="absolute -inset-2 rounded-full bg-primary/10"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
-                <Icon className={cn("h-5 w-5 relative z-10", active && "text-primary")} />
+                <Icon className={cn("h-5 w-5 relative z-10", active && "text-primary")} strokeWidth={active ? 2.5 : 1.5} />
               </div>
               <span className={cn(
                 "text-[10px] font-medium leading-tight",

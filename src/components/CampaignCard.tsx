@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { 
-  Calendar, 
-  MessageSquare, 
+  CalendarDays, 
+  MessageCircle, 
   BarChart3, 
   Eye,
   TrendingUp,
-  Clock
+  Timer
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -153,7 +153,7 @@ export const CampaignCard = ({
         <div className="grid grid-cols-3 gap-4 mb-4 text-center">
           <div>
             <div className="flex items-center justify-center gap-1 text-muted-foreground">
-              <Calendar className="h-3 w-3" />
+              <CalendarDays className="h-3 w-3" />
             </div>
             <div className="text-xs text-muted-foreground mt-1">
               {daysLeft > 0 ? `${daysLeft} dias` : "Vencido"}
@@ -189,7 +189,7 @@ export const CampaignCard = ({
         {daysLeft <= 3 && daysLeft > 0 && (
           <div className="mb-4 p-2 bg-warning/10 border border-warning/20 rounded-md">
             <div className="flex items-center gap-2 text-warning">
-              <Clock className="h-4 w-4" />
+              <Timer className="h-4 w-4" />
               <span className="text-xs font-medium">
                 Prazo próximo: {formatDate(campaign.deadline)}
               </span>
@@ -205,7 +205,7 @@ export const CampaignCard = ({
             onClick={() => onOpenChat?.(campaign)}
             className="flex-1"
           >
-            <MessageSquare className="h-4 w-4 mr-1" />
+            <MessageCircle className="h-4 w-4 mr-1" />
             Chat
           </Button>
           
