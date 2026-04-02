@@ -188,15 +188,15 @@
   }
 
   .glow-primary {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.3), 0 0 60px hsl(var(--primary) / 0.1);
+    box-shadow: 0 0 16px hsl(var(--primary) / 0.25), 0 0 48px hsl(var(--primary) / 0.08);
   }
 
   .glow-accent {
-    box-shadow: 0 0 20px hsl(var(--accent) / 0.3), 0 0 60px hsl(var(--accent) / 0.1);
+    box-shadow: 0 0 16px hsl(var(--accent) / 0.25), 0 0 48px hsl(var(--accent) / 0.08);
   }
 
   .glow-success {
-    box-shadow: 0 0 20px hsl(var(--success) / 0.3), 0 0 60px hsl(var(--success) / 0.1);
+    box-shadow: 0 0 16px hsl(var(--success) / 0.25), 0 0 48px hsl(var(--success) / 0.08);
   }
 
   .text-gradient-primary {
@@ -208,6 +208,26 @@
 
   .border-glow {
     border: 1px solid hsl(var(--primary) / 0.3);
-    box-shadow: inset 0 0 20px hsl(var(--primary) / 0.05);
+    box-shadow: inset 0 0 16px hsl(var(--primary) / 0.04);
+  }
+
+  /* WhatsApp-style floating doodle background */
+  .wa-bg-pattern {
+    position: relative;
+  }
+  .wa-bg-pattern::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M10 10l5 5M25 5l-3 8M45 12l6-4M60 8l2 7M75 15l-5 2M8 30l7 1M30 28l4 5M50 32l-2 6M65 25l5 5M15 50l3 4M35 48l-4 3M55 52l6-2M70 45l-3 7M5 65l6 2M25 70l4-5M48 68l3 4M62 62l5 3M78 70l-4 4' stroke='%23128C7E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%23128C7E'/%3E%3Ccircle cx='55' cy='40' r='1' fill='%23128C7E'/%3E%3Ccircle cx='40' cy='60' r='1.5' fill='%23128C7E'/%3E%3Ccircle cx='70' cy='55' r='1' fill='%23128C7E'/%3E%3C/svg%3E");
+    background-size: 80px 80px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .dark .wa-bg-pattern::before {
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M10 10l5 5M25 5l-3 8M45 12l6-4M60 8l2 7M75 15l-5 2M8 30l7 1M30 28l4 5M50 32l-2 6M65 25l5 5M15 50l3 4M35 48l-4 3M55 52l6-2M70 45l-3 7M5 65l6 2M25 70l4-5M48 68l3 4M62 62l5 3M78 70l-4 4' stroke='%2325D366' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='20' cy='20' r='1.5' fill='%2325D366'/%3E%3Ccircle cx='55' cy='40' r='1' fill='%2325D366'/%3E%3Ccircle cx='40' cy='60' r='1.5' fill='%2325D366'/%3E%3Ccircle cx='70' cy='55' r='1' fill='%2325D366'/%3E%3C/svg%3E");
   }
 }
