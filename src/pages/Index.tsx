@@ -236,12 +236,11 @@ const Index = ({ onNavigate }: IndexProps) => {
             <span className="text-xs font-medium">{t('global.platform')}</span>
           </div>
           
-          {/* Headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-3">
             {t('hero.title')}
           </h1>
           
-          <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-primary-foreground/75 mb-8 max-w-2xl mx-auto">
             {t('hero.subtitle')}
           </p>
           

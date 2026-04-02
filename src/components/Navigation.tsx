@@ -7,7 +7,7 @@ import {
   LogIn,
   UserPlus,
   LogOut,
-  Zap
+  CircleDot
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -70,48 +70,60 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-primary text-primary-foreground">
       <div className="container mx-auto px-4">
-        <div className="flex h-14 items-center justify-between">
+        <div className="flex h-12 items-center justify-between">
           {/* Logo */}
           <div 
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => handleNavigation("index")}
           >
-            <div className="bg-gradient-primary p-1.5 rounded-lg">
-              <Zap className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
+            <CircleDot className="h-5 w-5" />
+            <span className="font-bold text-base tracking-tight">
               StatusAds
             </span>
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="hidden md:flex items-center gap-1.5">
+          <div className="hidden md:flex items-center gap-1">
             <ThemeToggle />
             {user ? (
               <>
                 <Button 
-                  variant={currentPage.includes('dashboard') ? 'secondary' : 'ghost'} 
+                  variant="ghost"
                   size="sm" 
                   onClick={() => handleNavigation(getDashboardPage())}
-                  className="gap-1.5"
+                  className="gap-1.5 text-primary-foreground hover:bg-primary-foreground/10"
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-muted-foreground">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleLogout} 
+                  className="gap-1.5 text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                >
                   <LogOut className="h-4 w-4" />
                   {t('navigation.logout') || 'Sair'}
                 </Button>
               </>
             ) : (
               <>
-                <Button variant="ghost" size="sm" onClick={() => handleNavigation('auth')} className="gap-1.5">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleNavigation('auth')} 
+                  className="gap-1.5 text-primary-foreground hover:bg-primary-foreground/10"
+                >
                   <LogIn className="h-4 w-4" />
                   {t('navigation.login')}
                 </Button>
-                <Button size="sm" className="bg-gradient-primary hover:opacity-90 gap-1.5" onClick={() => handleNavigation('auth')}>
+                <Button 
+                  size="sm" 
+                  className="bg-primary-foreground/15 hover:bg-primary-foreground/25 text-primary-foreground gap-1.5 border-0" 
+                  onClick={() => handleNavigation('auth')}
+                >
                   <UserPlus className="h-4 w-4" />
                   {t('navigation.register')}
                 </Button>
@@ -124,11 +136,11 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
             <ThemeToggle />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="px-2">
+                <Button variant="ghost" size="sm" className="px-2 text-primary-foreground hover:bg-primary-foreground/10">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[260px]">
+              <SheetContent side="right" className="w-[240px]">
                 <div className="flex flex-col space-y-2 mt-8">
                   <div className="pb-4 border-b space-y-2">
                     {user ? (
@@ -148,7 +160,7 @@ export const Navigation = ({ onNavigate, currentPage }: NavigationProps) => {
                           <LogIn className="h-4 w-4 mr-2" />
                           {t('navigation.login')}
                         </Button>
-                        <Button className="w-full justify-start bg-gradient-primary" onClick={() => handleNavigation('auth')}>
+                        <Button className="w-full justify-start" onClick={() => handleNavigation('auth')}>
                           <UserPlus className="h-4 w-4 mr-2" />
                           {t('navigation.register')}
                         </Button>
