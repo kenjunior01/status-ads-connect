@@ -189,7 +189,7 @@ export const CampaignCard = ({
         {daysLeft <= 3 && daysLeft > 0 && (
           <div className="mb-4 p-2 bg-warning/10 border border-warning/20 rounded-md">
             <div className="flex items-center gap-2 text-warning">
-              <Clock className="h-4 w-4" />
+              <Timer className="h-4 w-4" />
               <span className="text-xs font-medium">
                 Prazo próximo: {formatDate(campaign.deadline)}
               </span>
