@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { 
-  Calendar, 
-  MessageSquare, 
+  CalendarDays, 
+  MessageCircle, 
   BarChart3, 
   Eye,
   TrendingUp,
-  Clock
+  Timer
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
