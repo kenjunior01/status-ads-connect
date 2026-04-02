@@ -15,6 +15,9 @@ import { NotificationButton } from "@/components/NotificationsPanel";
 import { ProofUploadForm } from "@/components/ProofUploadForm";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { CreatorWallet } from "@/components/CreatorWallet";
+import { GamificationProgress } from "@/components/GamificationProgress";
+import { GamificationBadge } from "@/components/GamificationBadge";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { 
