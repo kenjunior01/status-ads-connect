@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { GamificationBadge } from "@/components/GamificationBadge";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { Star, Verified, Eye, Zap } from "lucide-react";
@@ -27,13 +28,6 @@ interface PremiumCreatorCardProps {
   showFavoriteButton?: boolean;
 }
 
-const badgeConfig = {
-  bronze: { label: "Novo", textColor: "text-amber-600" },
-  silver: { label: "Crescendo", textColor: "text-slate-500" },
-  gold: { label: "Top", textColor: "text-amber-500" },
-  platinum: { label: "Elite", textColor: "text-purple-600" }
-};
-
 const getAvatarGradient = (name: string) => {
   const gradients = [
     "from-blue-500 to-purple-600",
@@ -55,7 +49,6 @@ export const PremiumCreatorCard = ({
 }: PremiumCreatorCardProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { format } = useLocalizationContext();
-  const badge = badgeConfig[profile.badge_level as keyof typeof badgeConfig] || badgeConfig.bronze;
   const isNew = Date.now() - new Date(profile.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
   const isTopRated = profile.rating >= 4.5 && profile.total_reviews >= 3;
 
@@ -148,9 +141,7 @@ export const PremiumCreatorCard = ({
             <p className="text-[10px] text-muted-foreground">A partir de</p>
             <p className="font-bold text-sm text-foreground">{format(getBasePrice())}</p>
           </div>
-          <Badge variant="outline" className={cn("text-[10px] px-1.5", badge.textColor)}>
-            {badge.label}
-          </Badge>
+          <GamificationBadge badgeLevel={profile.badge_level || 'bronze'} size="xs" />
         </div>
 
         {/* Hover CTA */}

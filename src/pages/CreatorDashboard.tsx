@@ -15,6 +15,9 @@ import { NotificationButton } from "@/components/NotificationsPanel";
 import { ProofUploadForm } from "@/components/ProofUploadForm";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { CreatorWallet } from "@/components/CreatorWallet";
+import { GamificationProgress } from "@/components/GamificationProgress";
+import { GamificationBadge } from "@/components/GamificationBadge";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { 
@@ -60,15 +63,30 @@ export const CreatorDashboard = () => {
     <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Painel do Criador</h1>
-            <p className="text-muted-foreground mt-1">Olá, {profile?.display_name || 'Criador'}! Gerencie suas campanhas e monitore seus ganhos</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Painel do Criador</h1>
+                <GamificationBadge badgeLevel={profile?.badge_level || 'bronze'} size="md" />
+              </div>
+              <p className="text-muted-foreground mt-1">Olá, {profile?.display_name || 'Criador'}! Gerencie suas campanhas e monitore seus ganhos</p>
+            </div>
           </div>
           <div className="flex gap-2">
             <NotificationButton />
             <Button variant="outline" size="sm"><Settings className="h-4 w-4 mr-2" />Configurações</Button>
           </div>
         </div>
+
+        {/* Onboarding */}
+        <OnboardingFlow
+          profile={profile}
+          onAction={(action) => {
+            if (action === 'name' || action === 'niche' || action === 'avatar') setActiveTab('profile');
+            if (action === 'first_campaign') setActiveTab('campaigns');
+          }}
+          onDismiss={() => {}}
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" />
@@ -91,6 +109,9 @@ export const CreatorDashboard = () => {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
+              {/* Gamification Progress */}
+              <GamificationProgress />
+              
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Award className="h-5 w-5" />Performance</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
@@ -98,10 +119,6 @@ export const CreatorDashboard = () => {
                   <div className="flex justify-between items-center"><span className="text-sm">Campanhas Concluídas</span><span className="font-semibold">{completedCampaigns.length}</span></div>
                   <div className="flex justify-between items-center"><span className="text-sm">Visualizações do Perfil</span><span className="font-semibold">{profile?.total_campaigns || 0}</span></div>
                 </CardContent>
-              </Card>
-              <Card>
-                <CardHeader><CardTitle>Próximos Passos</CardTitle></CardHeader>
-                <CardContent><ProgressCTA currentStep={profile?.bio ? 3 : 2} totalSteps={5} nextAction="Completar Perfil" onClick={() => setActiveTab("profile")} /></CardContent>
               </Card>
             </div>
             <TrustIndicators />
