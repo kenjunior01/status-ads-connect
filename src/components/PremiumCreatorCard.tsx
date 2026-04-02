@@ -142,9 +142,7 @@ export const PremiumCreatorCard = ({
             <p className="text-[10px] text-muted-foreground">A partir de</p>
             <p className="font-bold text-sm text-foreground">{format(getBasePrice())}</p>
           </div>
-          <Badge variant="outline" className={cn("text-[10px] px-1.5", badge.textColor)}>
-            {badge.label}
-          </Badge>
+          <GamificationBadge badgeLevel={profile.badge_level || 'bronze'} size="xs" />
         </div>
 
         {/* Hover CTA */}
