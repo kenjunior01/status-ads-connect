@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { GamificationBadge } from "@/components/GamificationBadge";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { Star, Verified, Eye, Zap } from "lucide-react";
@@ -26,13 +27,6 @@ interface PremiumCreatorCardProps {
   variant?: "default" | "featured" | "compact";
   showFavoriteButton?: boolean;
 }
-
-const badgeConfig = {
-  bronze: { label: "Novo", textColor: "text-amber-600" },
-  silver: { label: "Crescendo", textColor: "text-slate-500" },
-  gold: { label: "Top", textColor: "text-amber-500" },
-  platinum: { label: "Elite", textColor: "text-purple-600" }
-};
 
 const getAvatarGradient = (name: string) => {
   const gradients = [
