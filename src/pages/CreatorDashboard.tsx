@@ -109,6 +109,9 @@ export const CreatorDashboard = () => {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
+              {/* Gamification Progress */}
+              <GamificationProgress />
+              
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Award className="h-5 w-5" />Performance</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
@@ -116,10 +119,6 @@ export const CreatorDashboard = () => {
                   <div className="flex justify-between items-center"><span className="text-sm">Campanhas Concluídas</span><span className="font-semibold">{completedCampaigns.length}</span></div>
                   <div className="flex justify-between items-center"><span className="text-sm">Visualizações do Perfil</span><span className="font-semibold">{profile?.total_campaigns || 0}</span></div>
                 </CardContent>
-              </Card>
-              <Card>
-                <CardHeader><CardTitle>Próximos Passos</CardTitle></CardHeader>
-                <CardContent><ProgressCTA currentStep={profile?.bio ? 3 : 2} totalSteps={5} nextAction="Completar Perfil" onClick={() => setActiveTab("profile")} /></CardContent>
               </Card>
             </div>
             <TrustIndicators />
