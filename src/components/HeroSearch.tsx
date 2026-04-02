@@ -15,10 +15,10 @@ export const HeroSearch = ({ onSearch, onCategorySelect }: HeroSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const popularCategories = [
-    { label: t('niches.lifestyle'), icon: Sparkles, value: "lifestyle" },
+    { label: t('niches.lifestyle'), icon: Flame, value: "lifestyle" },
     { label: t('niches.fitness'), icon: TrendingUp, value: "fitness" },
-    { label: t('niches.tech'), icon: Zap, value: "tech" },
-    { label: t('niches.beauty'), icon: Users, value: "beauty" },
+    { label: t('niches.tech'), icon: Palette, value: "tech" },
+    { label: t('niches.beauty'), icon: Shirt, value: "beauty" },
   ];
 
   const handleSearch = () => {
