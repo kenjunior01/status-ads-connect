@@ -49,7 +49,6 @@ export const PremiumCreatorCard = ({
 }: PremiumCreatorCardProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const { format } = useLocalizationContext();
-  const badge = badgeConfig[profile.badge_level as keyof typeof badgeConfig] || badgeConfig.bronze;
   const isNew = Date.now() - new Date(profile.created_at).getTime() < 7 * 24 * 60 * 60 * 1000;
   const isTopRated = profile.rating >= 4.5 && profile.total_reviews >= 3;
 
