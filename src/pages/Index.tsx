@@ -231,10 +231,9 @@ const Index = ({ onNavigate }: IndexProps) => {
         <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-primary-foreground/3 rounded-full blur-xl animate-float" style={{ animationDelay: '0.8s' }} />
         
         <div className="relative z-10 max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full mb-6">
-            <Globe className="h-4 w-4" />
-            <span className="text-sm font-medium">{t('global.platform')}</span>
+          <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm text-primary-foreground px-3 py-1.5 rounded-full mb-4">
+            <Globe2 className="h-3.5 w-3.5" />
+            <span className="text-xs font-medium">{t('global.platform')}</span>
           </div>
           
           {/* Headline */}
