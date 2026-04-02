@@ -25,7 +25,8 @@ import {
   ArrowRight,
   ChevronDown,
   Heart,
-  Sparkles
+  Sparkles,
+  CircleDot
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
