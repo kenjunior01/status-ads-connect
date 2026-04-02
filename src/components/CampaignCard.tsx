@@ -153,7 +153,7 @@ export const CampaignCard = ({
         <div className="grid grid-cols-3 gap-4 mb-4 text-center">
           <div>
             <div className="flex items-center justify-center gap-1 text-muted-foreground">
-              <Calendar className="h-3 w-3" />
+              <CalendarDays className="h-3 w-3" />
             </div>
             <div className="text-xs text-muted-foreground mt-1">
               {daysLeft > 0 ? `${daysLeft} dias` : "Vencido"}
