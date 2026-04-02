@@ -205,7 +205,7 @@ export const CampaignCard = ({
             onClick={() => onOpenChat?.(campaign)}
             className="flex-1"
           >
-            <MessageSquare className="h-4 w-4 mr-1" />
+            <MessageCircle className="h-4 w-4 mr-1" />
             Chat
           </Button>
           
