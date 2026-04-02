@@ -63,15 +63,30 @@ export const CreatorDashboard = () => {
     <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Painel do Criador</h1>
-            <p className="text-muted-foreground mt-1">Olá, {profile?.display_name || 'Criador'}! Gerencie suas campanhas e monitore seus ganhos</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">Painel do Criador</h1>
+                <GamificationBadge badgeLevel={profile?.badge_level || 'bronze'} size="md" />
+              </div>
+              <p className="text-muted-foreground mt-1">Olá, {profile?.display_name || 'Criador'}! Gerencie suas campanhas e monitore seus ganhos</p>
+            </div>
           </div>
           <div className="flex gap-2">
             <NotificationButton />
             <Button variant="outline" size="sm"><Settings className="h-4 w-4 mr-2" />Configurações</Button>
           </div>
         </div>
+
+        {/* Onboarding */}
+        <OnboardingFlow
+          profile={profile}
+          onAction={(action) => {
+            if (action === 'name' || action === 'niche' || action === 'avatar') setActiveTab('profile');
+            if (action === 'first_campaign') setActiveTab('campaigns');
+          }}
+          onDismiss={() => {}}
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" />
