@@ -222,13 +222,13 @@ const Index = ({ onNavigate }: IndexProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background wa-bg-pattern">
       {/* Hero Section with Search */}
-      <section className="relative py-16 px-4 bg-gradient-hero overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-black/10" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+      <section className="relative py-12 px-4 bg-gradient-hero overflow-hidden">
+        {/* Floating circles */}
+        <div className="absolute top-10 left-[10%] w-32 h-32 bg-primary-foreground/5 rounded-full blur-2xl animate-float" />
+        <div className="absolute bottom-10 right-[15%] w-48 h-48 bg-primary-foreground/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-primary-foreground/3 rounded-full blur-xl animate-float" style={{ animationDelay: '0.8s' }} />
         
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           {/* Badge */}
