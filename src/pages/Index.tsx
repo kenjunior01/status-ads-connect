@@ -15,13 +15,13 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { 
   Users, 
-  MessageSquare, 
-  DollarSign, 
+  MessageCircle, 
+  Banknote, 
   Star, 
-  Shield,
+  ShieldCheck,
   Award,
   Zap,
-  Globe,
+  Globe2,
   ArrowRight,
   ChevronDown,
   Heart,
