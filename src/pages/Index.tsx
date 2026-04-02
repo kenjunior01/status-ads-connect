@@ -390,25 +390,26 @@ const Index = ({ onNavigate }: IndexProps) => {
       <ValuePropositionSection onNavigate={onNavigate} />
 
       {/* Final CTA Section */}
-      <section className="py-20 px-4 bg-gradient-hero text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <section className="py-16 px-4 bg-gradient-hero text-primary-foreground relative overflow-hidden">
+        <div className="absolute top-5 right-[20%] w-32 h-32 bg-primary-foreground/5 rounded-full blur-2xl animate-float" />
+        <div className="absolute bottom-5 left-[10%] w-40 h-40 bg-primary-foreground/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-            <Globe className="h-4 w-4" />
-            <span className="text-sm">{t('valueProposition.trustedBy')}</span>
+          <div className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur-sm px-3 py-1.5 rounded-full mb-4">
+            <Globe2 className="h-3.5 w-3.5" />
+            <span className="text-xs">{t('valueProposition.trustedBy')}</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             {t('valueProposition.creator.title')}
           </h2>
-          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-primary-foreground/75 mb-6 max-w-2xl mx-auto">
             {t('valueProposition.creator.description')}
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button 
               size="lg" 
-              className="bg-white text-primary hover:bg-white/90 gap-2 px-8"
+              className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 gap-2 px-6"
               onClick={() => onNavigate?.('auth')}
             >
               {t('valueProposition.creator.cta')}
@@ -417,7 +418,7 @@ const Index = ({ onNavigate }: IndexProps) => {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-white/30 text-white hover:bg-white/10"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
               onClick={() => onNavigate?.('advertiser-dashboard')}
             >
               {t('valueProposition.business.cta')}
