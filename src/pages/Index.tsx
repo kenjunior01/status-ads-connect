@@ -432,10 +432,8 @@ const Index = ({ onNavigate }: IndexProps) => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="bg-primary p-2.5 rounded-xl">
-                  <Globe className="h-5 w-5 text-white" />
-                </div>
+              <div className="flex items-center space-x-2 mb-4">
+                <CircleDot className="h-5 w-5 text-primary" />
                 <span className="text-lg font-bold">StatusAds</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
