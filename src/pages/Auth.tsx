@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { Zap, Shield, Users, Star } from "lucide-react";
+import { MessageCircle, Shield, Users, TrendingUp } from "lucide-react";
 import { LoginForm, SignupForm, ResetPasswordForm } from "@/components/AuthForms";
 import type { Session, User } from '@supabase/supabase-js';
 
@@ -52,47 +52,60 @@ const Auth = ({ onNavigate }: AuthProps) => {
 
   if (user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/20 border-t-white mx-auto mb-4"></div>
-          <h2 className="text-2xl font-bold mb-2">Redirecionando...</h2>
-          <p>Aguarde enquanto preparamos seu dashboard</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 via-background to-primary/10">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-3 border-muted border-t-primary mx-auto mb-4"></div>
+          <h2 className="text-xl font-bold text-foreground mb-1">Redirecionando...</h2>
+          <p className="text-sm text-muted-foreground">Preparando seu dashboard</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-hero">
-      <div className="w-full max-w-md">
-        <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
-              <Zap className="h-8 w-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-primary/15 via-background to-primary/5 relative overflow-hidden">
+      {/* Floating decorative elements */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[10%] left-[5%] w-64 h-64 bg-primary/5 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-[15%] right-[8%] w-48 h-48 bg-primary/8 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[50%] right-[15%] w-32 h-32 bg-primary/4 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
+      </div>
+
+      <div className="w-full max-w-[420px] relative z-10">
+        <Card className="shadow-2xl border border-border/30 bg-card/95 backdrop-blur-md rounded-2xl overflow-hidden">
+          <CardHeader className="text-center pb-2 pt-6">
+            <div className="mx-auto mb-3 w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25">
+              <MessageCircle className="h-7 w-7 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              StatusAds Pro
+            <CardTitle className="text-xl font-bold text-foreground">
+              StatusAds Connect
             </CardTitle>
-            <CardDescription className="text-base">
+            <CardDescription className="text-sm text-muted-foreground">
               Monetize seus status do WhatsApp
             </CardDescription>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="px-5 pb-5">
             {showResetPassword ? (
               <ResetPasswordForm onBack={() => setShowResetPassword(false)} />
             ) : (
               <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="login" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+                <TabsList className="grid w-full grid-cols-2 mb-5 h-10 bg-muted/40 rounded-xl p-1">
+                  <TabsTrigger 
+                    value="login" 
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg text-sm font-medium transition-all"
+                  >
                     Entrar
                   </TabsTrigger>
-                  <TabsTrigger value="signup" className="data-[state=active]:bg-primary data-[state=active]:text-white">
+                  <TabsTrigger 
+                    value="signup" 
+                    className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg text-sm font-medium transition-all"
+                  >
                     Cadastrar
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="login">
+                <TabsContent value="login" className="mt-0">
                   <LoginForm
                     onShowPassword={showPassword}
                     onTogglePassword={() => setShowPassword(!showPassword)}
@@ -101,7 +114,7 @@ const Auth = ({ onNavigate }: AuthProps) => {
                   <div className="mt-3 text-center">
                     <Button
                       variant="link"
-                      className="text-sm text-muted-foreground hover:text-primary"
+                      className="text-xs text-muted-foreground hover:text-primary p-0 h-auto"
                       onClick={() => setShowResetPassword(true)}
                     >
                       Esqueceu sua senha?
@@ -109,7 +122,7 @@ const Auth = ({ onNavigate }: AuthProps) => {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="signup">
+                <TabsContent value="signup" className="mt-0">
                   <SignupForm
                     onShowPassword={showPassword}
                     onTogglePassword={() => setShowPassword(!showPassword)}
@@ -119,11 +132,12 @@ const Auth = ({ onNavigate }: AuthProps) => {
               </Tabs>
             )}
 
-            <div className="mt-6 text-center">
+            <div className="mt-5 text-center">
               <Button 
                 variant="ghost" 
+                size="sm"
                 onClick={() => onNavigate('index')}
-                className="text-muted-foreground hover:text-primary"
+                className="text-xs text-muted-foreground hover:text-primary"
               >
                 ← Voltar ao início
               </Button>
@@ -131,19 +145,20 @@ const Auth = ({ onNavigate }: AuthProps) => {
           </CardContent>
         </Card>
 
-        <div className="mt-8 text-center text-white/80">
-          <div className="flex justify-center items-center gap-4 text-sm">
-            <div className="flex items-center gap-1">
-              <Shield className="h-4 w-4" />
-              <span>100% Seguro</span>
+        {/* Trust bar */}
+        <div className="mt-6 text-center">
+          <div className="flex justify-center items-center gap-5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-primary" />
+              <span>Seguro</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              <span>5k+ Usuários</span>
+            <div className="flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5 text-primary" />
+              <span>Verificado</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4" />
-              <span>4.9★ Avaliação</span>
+            <div className="flex items-center gap-1.5">
+              <TrendingUp className="h-3.5 w-3.5 text-primary" />
+              <span>Escrow</span>
             </div>
           </div>
         </div>
