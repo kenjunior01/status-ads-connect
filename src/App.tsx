@@ -7,12 +7,14 @@ import { Navigation } from "@/components/Navigation";
 import { BottomNavigation } from "@/components/BottomNavigation";
 import { PageTransition } from "@/components/PageTransition";
 import { LocalizationProvider } from "@/contexts/LocalizationContext";
+import { useAdaptiveTheme } from "@/hooks/useAdaptiveTheme";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import { CreatorDashboard } from "./pages/CreatorDashboard";
 import { AdvertiserDashboard } from "./pages/AdvertiserDashboard";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { GlobalDashboard } from "./pages/GlobalDashboard";
+import { AcademiaStatusAds } from "./components/AcademiaStatusAds";
 
 // Initialize i18n
 import "@/lib/i18n";
@@ -20,6 +22,7 @@ import "@/lib/i18n";
 const queryClient = new QueryClient();
 
 function App() {
+  useAdaptiveTheme();
   const [currentPage, setCurrentPage] = useState("index");
 
   const renderPage = () => {
@@ -36,6 +39,8 @@ function App() {
         return <AdminDashboard />;
       case "global-dashboard":
         return <GlobalDashboard />;
+      case "academia":
+        return <div className="max-w-2xl mx-auto py-8 px-4"><AcademiaStatusAds /></div>;
       case "creators":
         return <Index onNavigate={setCurrentPage} />;
       default:

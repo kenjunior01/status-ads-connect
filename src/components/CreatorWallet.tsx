@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useWallet } from "@/hooks/useWallet";
+import { WithdrawalCelebration } from "@/components/WithdrawalCelebration";
 import { 
   Wallet, 
   ArrowUpRight, 
@@ -24,17 +25,26 @@ export const CreatorWallet = () => {
   const [pixKey, setPixKey] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationAmount, setCelebrationAmount] = useState(0);
 
   const handleWithdraw = async () => {
     setWithdrawing(true);
-    const success = await requestWithdrawal(Number(withdrawAmount), pixKey);
+    const amount = Number(withdrawAmount);
+    const success = await requestWithdrawal(amount, pixKey);
     setWithdrawing(false);
     if (success) {
+      setCelebrationAmount(amount);
       setWithdrawAmount("");
       setPixKey("");
       setDialogOpen(false);
+      setShowCelebration(true);
     }
   };
+
+  const handleCelebrationComplete = useCallback(() => {
+    setShowCelebration(false);
+  }, []);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -79,6 +89,11 @@ export const CreatorWallet = () => {
 
   return (
     <div className="space-y-6">
+      <WithdrawalCelebration 
+        show={showCelebration} 
+        amount={celebrationAmount} 
+        onComplete={handleCelebrationComplete} 
+      />
       {/* Balance Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-green-500/20 bg-green-500/5">
