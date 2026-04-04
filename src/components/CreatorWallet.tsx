@@ -89,6 +89,11 @@ export const CreatorWallet = () => {
 
   return (
     <div className="space-y-6">
+      <WithdrawalCelebration 
+        show={showCelebration} 
+        amount={celebrationAmount} 
+        onComplete={handleCelebrationComplete} 
+      />
       {/* Balance Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-green-500/20 bg-green-500/5">
