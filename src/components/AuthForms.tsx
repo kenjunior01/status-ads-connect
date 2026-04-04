@@ -2,11 +2,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Star, Users, ArrowLeft } from "lucide-react";
+import { 
+  Eye, EyeOff, ArrowLeft, ArrowRight, Check,
+  MessageCircle, Megaphone, TrendingUp, DollarSign,
+  Users, BarChart3, Shield, Sparkles, CircleDot
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { loginSchema, signupSchema, resetPasswordSchema, type LoginFormData, type SignupFormData } from "@/lib/auth-schemas";
+import { cn } from "@/lib/utils";
 
 interface LoginFormProps {
   onShowPassword: boolean;
@@ -18,6 +23,7 @@ export const LoginForm = ({ onShowPassword, onTogglePassword, loading }: LoginFo
   const { toast } = useToast();
   const [loginData, setLoginData] = useState<LoginFormData>({ email: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +39,7 @@ export const LoginForm = ({ onShowPassword, onTogglePassword, loading }: LoginFo
       return;
     }
 
+    setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email: loginData.email,
@@ -52,26 +59,28 @@ export const LoginForm = ({ onShowPassword, onTogglePassword, loading }: LoginFo
       }
     } catch {
       toast({ title: "Erro inesperado", description: "Tente novamente.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="login-email">Email</Label>
+        <Label htmlFor="login-email" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">Email</Label>
         <Input
           id="login-email"
           type="email"
           placeholder="seu@email.com"
           value={loginData.email}
           onChange={(e) => setLoginData(prev => ({ ...prev, email: e.target.value }))}
-          className={`h-12 ${errors.email ? 'border-destructive' : ''}`}
+          className={cn("h-11 bg-muted/30 border-border/40 focus:border-primary/60 transition-colors", errors.email && 'border-destructive')}
         />
         {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="login-password">Senha</Label>
+        <Label htmlFor="login-password" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">Senha</Label>
         <div className="relative">
           <Input
             id="login-password"
@@ -79,30 +88,83 @@ export const LoginForm = ({ onShowPassword, onTogglePassword, loading }: LoginFo
             placeholder="Sua senha"
             value={loginData.password}
             onChange={(e) => setLoginData(prev => ({ ...prev, password: e.target.value }))}
-            className={`h-12 pr-12 ${errors.password ? 'border-destructive' : ''}`}
+            className={cn("h-11 pr-12 bg-muted/30 border-border/40 focus:border-primary/60 transition-colors", errors.password && 'border-destructive')}
           />
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             onClick={onTogglePassword}
           >
-            {onShowPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            {onShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
       </div>
 
-      <Button type="submit" className="w-full h-12 bg-gradient-primary hover:opacity-90 text-white font-semibold" disabled={loading}>
-        {loading ? "Entrando..." : "Entrar"}
+      <Button 
+        type="submit" 
+        className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/20" 
+        disabled={isLoading || loading}
+      >
+        {isLoading ? (
+          <span className="flex items-center gap-2">
+            <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+            Entrando...
+          </span>
+        ) : "Entrar"}
       </Button>
     </form>
   );
 };
 
+// ─── Role Selection Card ──────────────────────────────────────
+const roleCards = [
+  {
+    id: "creator" as const,
+    title: "Criador de Status",
+    subtitle: "Monetize seu WhatsApp",
+    icon: MessageCircle,
+    color: "from-emerald-500 to-teal-600",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/30",
+    activeRing: "ring-emerald-500/40",
+    benefits: [
+      { icon: DollarSign, text: "Ganhe dinheiro com seus Status" },
+      { icon: TrendingUp, text: "Métricas de performance em tempo real" },
+      { icon: Shield, text: "Pagamentos seguros via escrow" },
+    ]
+  },
+  {
+    id: "advertiser" as const,
+    title: "Anunciante",
+    subtitle: "Alcance milhares de pessoas",
+    icon: Megaphone,
+    color: "from-blue-500 to-indigo-600",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/30",
+    activeRing: "ring-blue-500/40",
+    benefits: [
+      { icon: Users, text: "Acesse criadores verificados" },
+      { icon: BarChart3, text: "ROI mensurável por campanha" },
+      { icon: Sparkles, text: "IA para matching ideal" },
+    ]
+  }
+];
+
 export const SignupForm = ({ onShowPassword, onTogglePassword, loading }: LoginFormProps) => {
   const { toast } = useToast();
+  const [step, setStep] = useState(0); // 0: role, 1: details
   const [signupData, setSignupData] = useState<SignupFormData>({ name: '', role: 'creator', email: '', password: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const selectedRole = roleCards.find(r => r.id === signupData.role)!;
+
+  const passwordChecks = [
+    { label: "Mín. 6 caracteres", valid: signupData.password.length >= 6 },
+    { label: "1 letra maiúscula", valid: /[A-Z]/.test(signupData.password) },
+    { label: "1 número", valid: /[0-9]/.test(signupData.password) },
+  ];
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,13 +180,13 @@ export const SignupForm = ({ onShowPassword, onTogglePassword, loading }: LoginF
       return;
     }
 
+    setIsLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}/`;
       const { error } = await supabase.auth.signUp({
         email: signupData.email,
         password: signupData.password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: window.location.origin,
           data: { display_name: signupData.name, role: signupData.role }
         }
       });
@@ -138,91 +200,243 @@ export const SignupForm = ({ onShowPassword, onTogglePassword, loading }: LoginF
           variant: "destructive",
         });
       } else {
-        toast({ title: "Cadastro realizado!", description: "Confirme seu email para ativar sua conta." });
-        setSignupData({ name: '', role: 'creator', email: '', password: '' });
+        toast({ 
+          title: "🎉 Conta criada com sucesso!", 
+          description: signupData.role === 'creator' 
+            ? "Bem-vindo! Comece a monetizar seus Status."
+            : "Bem-vindo! Encontre os melhores criadores."
+        });
       }
     } catch {
       toast({ title: "Erro inesperado", description: "Tente novamente.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSignup} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="signup-name">Nome Completo</Label>
-        <Input
-          id="signup-name"
-          placeholder="Seu nome completo"
-          value={signupData.name}
-          onChange={(e) => setSignupData(prev => ({ ...prev, name: e.target.value }))}
-          className={`h-12 ${errors.name ? 'border-destructive' : ''}`}
-        />
-        {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-role">Tipo de Conta</Label>
-        <Select value={signupData.role} onValueChange={(value: "creator" | "advertiser") => setSignupData(prev => ({ ...prev, role: value }))}>
-          <SelectTrigger className={`h-12 ${errors.role ? 'border-destructive' : ''}`}>
-            <SelectValue placeholder="Selecione o tipo de conta" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="creator">
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-success" />
-                <span>Criador - Monetize seus status</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="advertiser">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-primary" />
-                <span>Anunciante - Encontre criadores</span>
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.role && <p className="text-xs text-destructive">{errors.role}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-email">Email</Label>
-        <Input
-          id="signup-email"
-          type="email"
-          placeholder="seu@email.com"
-          value={signupData.email}
-          onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
-          className={`h-12 ${errors.email ? 'border-destructive' : ''}`}
-        />
-        {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="signup-password">Senha</Label>
-        <div className="relative">
-          <Input
-            id="signup-password"
-            type={onShowPassword ? "text" : "password"}
-            placeholder="Mín. 6 chars, 1 maiúscula, 1 número"
-            value={signupData.password}
-            onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
-            className={`h-12 pr-12 ${errors.password ? 'border-destructive' : ''}`}
-          />
-          <button
-            type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            onClick={onTogglePassword}
+    <div className="space-y-4">
+      <AnimatePresence mode="wait">
+        {step === 0 ? (
+          <motion.div
+            key="role-select"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-3"
           >
-            {onShowPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-          </button>
-        </div>
-        {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
-      </div>
+            <p className="text-sm text-muted-foreground text-center mb-1">
+              Como você quer usar o StatusAds?
+            </p>
 
-      <Button type="submit" className="w-full h-12 bg-gradient-primary hover:opacity-90 text-white font-semibold" disabled={loading}>
-        {loading ? "Cadastrando..." : "Criar Conta"}
-      </Button>
-    </form>
+            {roleCards.map((role) => {
+              const Icon = role.icon;
+              const isSelected = signupData.role === role.id;
+
+              return (
+                <button
+                  key={role.id}
+                  type="button"
+                  onClick={() => setSignupData(prev => ({ ...prev, role: role.id }))}
+                  className={cn(
+                    "w-full p-4 rounded-xl border-2 transition-all duration-200 text-left",
+                    isSelected
+                      ? `${role.borderColor} ${role.bgColor} ring-2 ${role.activeRing}`
+                      : "border-border/40 hover:border-border/60 bg-muted/20"
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={cn(
+                      "w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br shrink-0",
+                      role.color
+                    )}>
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-sm text-foreground">{role.title}</h3>
+                        <div className={cn(
+                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                          isSelected ? "border-primary bg-primary" : "border-muted-foreground/30"
+                        )}>
+                          {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{role.subtitle}</p>
+                      
+                      <AnimatePresence>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="mt-3 space-y-1.5">
+                              {role.benefits.map((b, i) => {
+                                const BIcon = b.icon;
+                                return (
+                                  <div key={i} className="flex items-center gap-2 text-xs text-foreground/70">
+                                    <BIcon className="h-3.5 w-3.5 text-primary shrink-0" />
+                                    <span>{b.text}</span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+
+            <Button 
+              onClick={() => setStep(1)} 
+              className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/20 mt-2"
+            >
+              Continuar <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="details"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.2 }}
+          >
+            {/* Role indicator pill */}
+            <div className="flex items-center justify-between mb-4">
+              <button
+                type="button"
+                onClick={() => setStep(0)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" /> Alterar tipo
+              </button>
+              <div className={cn(
+                "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium",
+                selectedRole.bgColor, "text-foreground"
+              )}>
+                <selectedRole.icon className="h-3 w-3" />
+                {selectedRole.title}
+              </div>
+            </div>
+
+            <form onSubmit={handleSignup} className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="signup-name" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">
+                  {signupData.role === 'creator' ? 'Nome artístico / público' : 'Nome ou empresa'}
+                </Label>
+                <Input
+                  id="signup-name"
+                  placeholder={signupData.role === 'creator' ? 'Ex: João Creator' : 'Ex: Empresa ABC'}
+                  value={signupData.name}
+                  onChange={(e) => setSignupData(prev => ({ ...prev, name: e.target.value }))}
+                  className={cn("h-11 bg-muted/30 border-border/40 focus:border-primary/60", errors.name && 'border-destructive')}
+                />
+                {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="signup-email" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">Email</Label>
+                <Input
+                  id="signup-email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={signupData.email}
+                  onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
+                  className={cn("h-11 bg-muted/30 border-border/40 focus:border-primary/60", errors.email && 'border-destructive')}
+                />
+                {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="signup-password" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">Senha</Label>
+                <div className="relative">
+                  <Input
+                    id="signup-password"
+                    type={onShowPassword ? "text" : "password"}
+                    placeholder="Crie uma senha forte"
+                    value={signupData.password}
+                    onChange={(e) => setSignupData(prev => ({ ...prev, password: e.target.value }))}
+                    className={cn("h-11 pr-12 bg-muted/30 border-border/40 focus:border-primary/60", errors.password && 'border-destructive')}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={onTogglePassword}
+                  >
+                    {onShowPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+
+                {/* Live password strength */}
+                {signupData.password.length > 0 && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    className="flex gap-3 pt-1"
+                  >
+                    {passwordChecks.map((check, i) => (
+                      <div key={i} className="flex items-center gap-1">
+                        <div className={cn(
+                          "w-3.5 h-3.5 rounded-full flex items-center justify-center transition-colors",
+                          check.valid ? "bg-primary" : "bg-muted-foreground/20"
+                        )}>
+                          {check.valid && <Check className="h-2 w-2 text-primary-foreground" />}
+                        </div>
+                        <span className={cn(
+                          "text-[10px]",
+                          check.valid ? "text-primary" : "text-muted-foreground"
+                        )}>
+                          {check.label}
+                        </span>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
+
+              <Button 
+                type="submit" 
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg shadow-primary/20 mt-1" 
+                disabled={isLoading || loading}
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    Criando conta...
+                  </span>
+                ) : (
+                  <>
+                    Criar minha conta <Sparkles className="h-4 w-4 ml-1" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Step indicator */}
+      <div className="flex justify-center gap-2 pt-1">
+        {[0, 1].map(s => (
+          <div
+            key={s}
+            className={cn(
+              "h-1 rounded-full transition-all duration-300",
+              s === step ? "w-6 bg-primary" : "w-2 bg-muted-foreground/20"
+            )}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -272,14 +486,14 @@ export const ResetPasswordForm = ({ onBack }: ResetPasswordFormProps) => {
   if (sent) {
     return (
       <div className="text-center space-y-4 py-4">
-        <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto">
-          <Star className="h-8 w-8 text-success" />
+        <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+          <Check className="h-7 w-7 text-primary" />
         </div>
-        <h3 className="text-lg font-semibold">Email enviado!</h3>
+        <h3 className="text-lg font-semibold text-foreground">Email enviado!</h3>
         <p className="text-sm text-muted-foreground">
-          Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.
+          Verifique sua caixa de entrada e siga as instruções.
         </p>
-        <Button variant="ghost" onClick={onBack} className="gap-2">
+        <Button variant="ghost" onClick={onBack} className="gap-2 text-muted-foreground">
           <ArrowLeft className="h-4 w-4" /> Voltar ao login
         </Button>
       </div>
@@ -289,25 +503,25 @@ export const ResetPasswordForm = ({ onBack }: ResetPasswordFormProps) => {
   return (
     <form onSubmit={handleReset} className="space-y-4">
       <div className="text-center mb-2">
-        <h3 className="text-lg font-semibold">Esqueceu sua senha?</h3>
+        <h3 className="text-lg font-semibold text-foreground">Esqueceu sua senha?</h3>
         <p className="text-sm text-muted-foreground">Digite seu email para receber um link de redefinição.</p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="reset-email">Email</Label>
+        <Label htmlFor="reset-email" className="text-foreground/80 text-xs font-medium uppercase tracking-wider">Email</Label>
         <Input
           id="reset-email"
           type="email"
           placeholder="seu@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={`h-12 ${errors.email ? 'border-destructive' : ''}`}
+          className={cn("h-11 bg-muted/30 border-border/40", errors.email && 'border-destructive')}
         />
         {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
       </div>
-      <Button type="submit" className="w-full h-12 bg-gradient-primary hover:opacity-90 text-white font-semibold" disabled={loading}>
+      <Button type="submit" className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl" disabled={loading}>
         {loading ? "Enviando..." : "Enviar link de redefinição"}
       </Button>
-      <Button type="button" variant="ghost" className="w-full gap-2" onClick={onBack}>
+      <Button type="button" variant="ghost" className="w-full gap-2 text-muted-foreground" onClick={onBack}>
         <ArrowLeft className="h-4 w-4" /> Voltar ao login
       </Button>
     </form>
