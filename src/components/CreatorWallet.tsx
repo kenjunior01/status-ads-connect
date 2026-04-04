@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useWallet } from "@/hooks/useWallet";
+import { WithdrawalCelebration } from "@/components/WithdrawalCelebration";
 import { 
   Wallet, 
   ArrowUpRight, 
@@ -24,17 +25,26 @@ export const CreatorWallet = () => {
   const [pixKey, setPixKey] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationAmount, setCelebrationAmount] = useState(0);
 
   const handleWithdraw = async () => {
     setWithdrawing(true);
-    const success = await requestWithdrawal(Number(withdrawAmount), pixKey);
+    const amount = Number(withdrawAmount);
+    const success = await requestWithdrawal(amount, pixKey);
     setWithdrawing(false);
     if (success) {
+      setCelebrationAmount(amount);
       setWithdrawAmount("");
       setPixKey("");
       setDialogOpen(false);
+      setShowCelebration(true);
     }
   };
+
+  const handleCelebrationComplete = useCallback(() => {
+    setShowCelebration(false);
+  }, []);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
