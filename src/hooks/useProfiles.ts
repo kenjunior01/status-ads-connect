@@ -31,6 +31,7 @@ export const useProfiles = () => {
         .from('creator_listings' as any)
         .select('*')
         .not('display_name', 'is', null)
+        .not('profile_id', 'is', null)
         .order('rating', { ascending: false })
         .limit(50)) as { data: Profile[] | null; error: any };
 
