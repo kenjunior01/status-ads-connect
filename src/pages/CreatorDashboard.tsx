@@ -18,8 +18,10 @@ import { CreatorWallet } from "@/components/CreatorWallet";
 import { GamificationProgress } from "@/components/GamificationProgress";
 import { GamificationBadge } from "@/components/GamificationBadge";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { SwipeCampaignCards } from "@/components/SwipeCampaignCards";
 import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   DollarSign, 
   TrendingUp, 
