@@ -43,6 +43,7 @@ export const CreatorDashboard = () => {
   const [selectedCampaignForProof, setSelectedCampaignForProof] = useState<string | null>(null);
   const { profile, loading: profileLoading } = useProfile();
   const { campaigns, loading: campaignsLoading } = useCampaigns();
+  const isMobile = useIsMobile();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const completedCampaigns = campaigns.filter(c => c.status === 'completed');
