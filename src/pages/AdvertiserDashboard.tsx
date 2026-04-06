@@ -234,7 +234,57 @@ export const AdvertiserDashboard = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="creators" className="space-y-6">
+          <TabsContent value="payments" className="space-y-6">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              Pagamentos de Campanhas
+            </h2>
+            {selectedCampaignForPayment ? (
+              <div className="max-w-lg mx-auto">
+                <PaymentCheckout
+                  campaignId={selectedCampaignForPayment.id}
+                  creatorId={selectedCampaignForPayment.creator_id}
+                  amount={Number(selectedCampaignForPayment.price)}
+                  campaignTitle={selectedCampaignForPayment.title}
+                  onSuccess={() => {
+                    setSelectedCampaignForPayment(null);
+                    refetch();
+                  }}
+                  onCancel={() => setSelectedCampaignForPayment(null)}
+                />
+              </div>
+            ) : (
+              <>
+                {campaigns.filter(c => c.status === 'pending' && (!('escrow_status' in c) || (c as any).escrow_status === 'pending')).length === 0 ? (
+                  <Card className="p-8 text-center">
+                    <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhuma campanha pendente de pagamento.</p>
+                    <p className="text-sm text-muted-foreground mt-2">Crie uma nova campanha para iniciar o processo de pagamento.</p>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {campaigns
+                      .filter(c => c.status === 'pending')
+                      .map((campaign) => (
+                        <Card key={campaign.id} className="p-4 cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setSelectedCampaignForPayment(campaign)}>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-semibold">{campaign.title}</h3>
+                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                            </div>
+                            <Button size="sm" className="bg-gradient-primary hover:opacity-90">
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Pagar
+                            </Button>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+
             <h2 className="text-xl font-semibold">Encontrar Criadores</h2>
             <SearchFilters onFiltersChange={() => {}} showPriceFilter showNicheFilter showRatingFilter showLocationFilter />
             {profiles.length === 0 ? (
