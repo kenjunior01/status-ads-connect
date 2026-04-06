@@ -285,6 +285,7 @@ export const AdvertiserDashboard = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="creators" className="space-y-6">
             <h2 className="text-xl font-semibold">Encontrar Criadores</h2>
             <SearchFilters onFiltersChange={() => {}} showPriceFilter showNicheFilter showRatingFilter showLocationFilter />
             {profiles.length === 0 ? (
