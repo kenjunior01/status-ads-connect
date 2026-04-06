@@ -98,12 +98,16 @@ export const AdvertiserDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
             <TabsTrigger value="verification" className="flex items-center gap-1">
               <CheckCircle className="h-4 w-4" />
               Verificação
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex items-center gap-1">
+              <CreditCard className="h-4 w-4" />
+              Pagamentos
             </TabsTrigger>
             <TabsTrigger value="creators">Criadores</TabsTrigger>
             <TabsTrigger value="statusai" className="flex items-center gap-1">
