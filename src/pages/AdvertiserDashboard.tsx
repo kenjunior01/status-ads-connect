@@ -25,7 +25,8 @@ export const AdvertiserDashboard = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCampaignForReview, setSelectedCampaignForReview] = useState<string | null>(null);
-  const { campaigns, loading: campaignsLoading } = useCampaigns();
+  const [selectedCampaignForPayment, setSelectedCampaignForPayment] = useState<any>(null);
+  const { campaigns, loading: campaignsLoading, refetch } = useCampaigns();
   const { profiles, loading: profilesLoading } = useProfiles();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
