@@ -16,9 +16,10 @@ import { ProofReviewPanel } from "@/components/ProofReviewPanel";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { StatusAIMatchmaker } from "@/components/StatusAIMatchmaker";
 import { StatusAIROIPredictor } from "@/components/StatusAIROIPredictor";
+import { PaymentCheckout } from "@/components/PaymentCheckout";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
-import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot } from "lucide-react";
+import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot, CreditCard } from "lucide-react";
 
 export const AdvertiserDashboard = () => {
   const { t } = useTranslation();
