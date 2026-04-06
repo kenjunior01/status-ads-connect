@@ -18,8 +18,10 @@ import { CreatorWallet } from "@/components/CreatorWallet";
 import { GamificationProgress } from "@/components/GamificationProgress";
 import { GamificationBadge } from "@/components/GamificationBadge";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { SwipeCampaignCards } from "@/components/SwipeCampaignCards";
 import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -41,6 +43,7 @@ export const CreatorDashboard = () => {
   const [selectedCampaignForProof, setSelectedCampaignForProof] = useState<string | null>(null);
   const { profile, loading: profileLoading } = useProfile();
   const { campaigns, loading: campaignsLoading } = useCampaigns();
+  const isMobile = useIsMobile();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const completedCampaigns = campaigns.filter(c => c.status === 'completed');
@@ -158,6 +161,32 @@ export const CreatorDashboard = () => {
               <Card className="p-8 text-center">
                 <p className="text-muted-foreground">Você ainda não tem campanhas. Aguarde propostas de anunciantes!</p>
               </Card>
+            ) : isMobile ? (
+              <SwipeCampaignCards>
+                {campaigns.map((campaign) => (
+                  <Card key={campaign.id} className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold">{campaign.title}</h3>
+                        <VerificationBadge status={(campaign.verification_status as VerificationStatus) || 'not_started'} />
+                      </div>
+                      <p className="text-sm text-muted-foreground">{campaign.description}</p>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                        <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
+                          {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
+                        </Badge>
+                      </div>
+                      {campaign.status === 'active' && campaign.verification_status !== 'verified' && (
+                        <Button size="sm" className="w-full" onClick={() => setSelectedCampaignForProof(campaign.id)}>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Enviar Prova
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </SwipeCampaignCards>
             ) : (
               <div className="grid gap-4">
                 {campaigns.map((campaign) => (
@@ -178,10 +207,7 @@ export const CreatorDashboard = () => {
                       </div>
                       <div className="flex gap-2">
                         {campaign.status === 'active' && campaign.verification_status !== 'verified' && (
-                          <Button 
-                            size="sm"
-                            onClick={() => setSelectedCampaignForProof(campaign.id)}
-                          >
+                          <Button size="sm" onClick={() => setSelectedCampaignForProof(campaign.id)}>
                             <Upload className="h-4 w-4 mr-2" />
                             Enviar Prova
                           </Button>

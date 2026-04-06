@@ -5,3 +5,9 @@ verify_jwt = false
 
 [functions.platform-stats]
 verify_jwt = false
+
+[functions.paysuite-payment]
+verify_jwt = false
+
+[functions.paypal-payment]
+verify_jwt = false

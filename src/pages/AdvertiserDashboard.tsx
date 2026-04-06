@@ -16,15 +16,17 @@ import { ProofReviewPanel } from "@/components/ProofReviewPanel";
 import { VerificationBadge } from "@/components/VerificationBadge";
 import { StatusAIMatchmaker } from "@/components/StatusAIMatchmaker";
 import { StatusAIROIPredictor } from "@/components/StatusAIROIPredictor";
+import { PaymentCheckout } from "@/components/PaymentCheckout";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
-import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot } from "lucide-react";
+import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot, CreditCard } from "lucide-react";
 
 export const AdvertiserDashboard = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedCampaignForReview, setSelectedCampaignForReview] = useState<string | null>(null);
-  const { campaigns, loading: campaignsLoading } = useCampaigns();
+  const [selectedCampaignForPayment, setSelectedCampaignForPayment] = useState<any>(null);
+  const { campaigns, loading: campaignsLoading, refetch } = useCampaigns();
   const { profiles, loading: profilesLoading } = useProfiles();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
@@ -96,12 +98,16 @@ export const AdvertiserDashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="campaigns">Campanhas</TabsTrigger>
             <TabsTrigger value="verification" className="flex items-center gap-1">
               <CheckCircle className="h-4 w-4" />
               Verificação
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex items-center gap-1">
+              <CreditCard className="h-4 w-4" />
+              Pagamentos
             </TabsTrigger>
             <TabsTrigger value="creators">Criadores</TabsTrigger>
             <TabsTrigger value="statusai" className="flex items-center gap-1">
@@ -219,6 +225,57 @@ export const AdvertiserDashboard = () => {
                               <VerificationBadge status={(campaign.verification_status as 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected') || 'not_started'} />
                               <Button size="sm">Revisar</Button>
                             </div>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="payments" className="space-y-6">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              Pagamentos de Campanhas
+            </h2>
+            {selectedCampaignForPayment ? (
+              <div className="max-w-lg mx-auto">
+                <PaymentCheckout
+                  campaignId={selectedCampaignForPayment.id}
+                  creatorId={selectedCampaignForPayment.creator_id}
+                  amount={Number(selectedCampaignForPayment.price)}
+                  campaignTitle={selectedCampaignForPayment.title}
+                  onSuccess={() => {
+                    setSelectedCampaignForPayment(null);
+                    refetch();
+                  }}
+                  onCancel={() => setSelectedCampaignForPayment(null)}
+                />
+              </div>
+            ) : (
+              <>
+                {campaigns.filter(c => c.status === 'pending' && (!('escrow_status' in c) || (c as any).escrow_status === 'pending')).length === 0 ? (
+                  <Card className="p-8 text-center">
+                    <CreditCard className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhuma campanha pendente de pagamento.</p>
+                    <p className="text-sm text-muted-foreground mt-2">Crie uma nova campanha para iniciar o processo de pagamento.</p>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {campaigns
+                      .filter(c => c.status === 'pending')
+                      .map((campaign) => (
+                        <Card key={campaign.id} className="p-4 cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => setSelectedCampaignForPayment(campaign)}>
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <h3 className="font-semibold">{campaign.title}</h3>
+                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                            </div>
+                            <Button size="sm" className="bg-gradient-primary hover:opacity-90">
+                              <CreditCard className="h-4 w-4 mr-2" />
+                              Pagar
+                            </Button>
                           </div>
                         </Card>
                       ))}
