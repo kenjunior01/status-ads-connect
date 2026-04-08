@@ -45,6 +45,7 @@ export const CreatorDashboard = () => {
   const { profile, loading: profileLoading } = useProfile();
   const { campaigns, loading: campaignsLoading } = useCampaigns();
   const isMobile = useIsMobile();
+  const { formatFromUSD } = useLocalizationContext();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const completedCampaigns = campaigns.filter(c => c.status === 'completed');
