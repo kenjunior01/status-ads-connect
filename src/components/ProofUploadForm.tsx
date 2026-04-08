@@ -205,6 +205,73 @@ export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps)
             />
           </div>
 
+          {/* AI Pre-validation */}
+          {(preview || (proofType === 'link' && linkUrl)) && !aiValidated && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleAIValidation}
+              disabled={analyzing}
+              className="w-full border-primary/30 text-primary hover:bg-primary/5"
+            >
+              {analyzing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  StatusAI analisando...
+                </>
+              ) : (
+                <>
+                  <Bot className="h-4 w-4 mr-2" />
+                  Validar com StatusAI antes de enviar
+                </>
+              )}
+            </Button>
+          )}
+
+          {/* AI Analysis Result */}
+          {aiAnalysis && (
+            <div className={cn(
+              "rounded-lg border p-3 space-y-2",
+              aiAnalysis.is_valid_status
+                ? "border-primary/30 bg-primary/5"
+                : "border-warning/30 bg-warning/5"
+            )}>
+              <div className="flex items-center gap-2">
+                {aiAnalysis.is_valid_status ? (
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                ) : (
+                  <AlertTriangle className="h-4 w-4 text-warning" />
+                )}
+                <span className="text-sm font-medium">
+                  {aiAnalysis.is_valid_status ? 'Status válido' : 'Atenção'}
+                </span>
+                <Badge variant="secondary" className="ml-auto text-xs">
+                  Confiança: {Math.round((aiAnalysis.confidence || 0) * 100)}%
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">{aiAnalysis.summary}</p>
+              {aiAnalysis.ad_integrity > 0 && (
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Integridade do anúncio</span>
+                    <span className="font-medium">{Math.round(aiAnalysis.ad_integrity * 100)}%</span>
+                  </div>
+                  <Progress value={aiAnalysis.ad_integrity * 100} className="h-1" />
+                </div>
+              )}
+              {aiAnalysis.issues?.length > 0 && (
+                <ul className="text-xs text-warning space-y-0.5">
+                  {aiAnalysis.issues.map((issue: string, i: number) => (
+                    <li key={i} className="flex items-start gap-1">
+                      <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                      {issue}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           <Button 
             onClick={handleSubmit} 
             disabled={uploading || (!file && !linkUrl)}
