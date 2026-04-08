@@ -119,7 +119,7 @@ export const CreatorWallet = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Saldo Pendente</p>
-                <p className="text-2xl font-bold text-yellow-600">R$ {pending.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-yellow-600">{formatFromUSD(pending)}</p>
               </div>
             </div>
           </CardContent>
