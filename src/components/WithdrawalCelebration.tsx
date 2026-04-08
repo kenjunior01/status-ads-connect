@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PartyPopper, Coins, Trophy } from "lucide-react";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 
 interface WithdrawalCelebrationProps {
   show: boolean;
