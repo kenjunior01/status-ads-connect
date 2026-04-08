@@ -21,6 +21,7 @@ import {
 
 export const CreatorWallet = () => {
   const { wallet, transactions, loading, requestWithdrawal } = useWallet();
+  const { formatFromUSD } = useLocalizationContext();
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [pixKey, setPixKey] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
