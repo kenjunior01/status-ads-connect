@@ -133,7 +133,7 @@ export const CreatorWallet = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Ganho</p>
-                <p className="text-2xl font-bold text-primary">R$ {totalEarned.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-primary">{formatFromUSD(totalEarned)}</p>
               </div>
             </div>
           </CardContent>
