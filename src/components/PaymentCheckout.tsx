@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocalizationContext } from '@/contexts/LocalizationContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ export const PaymentCheckout = ({
   const [loading, setLoading] = useState(false);
   const [mpesaPhone, setMpesaPhone] = useState('');
   const { toast } = useToast();
+  const { formatFromUSD } = useLocalizationContext();
 
   const platformFee = Math.round(amount * PLATFORM_FEE_PERCENT) / 100;
   const creatorPayout = amount - platformFee;
@@ -102,9 +104,9 @@ export const PaymentCheckout = ({
       <CardContent className="space-y-5">
         {/* Summary */}
         <div className="p-3 bg-muted/50 rounded-lg space-y-2 text-sm">
-          <div className="flex justify-between"><span>Valor da campanha</span><span className="font-semibold">R$ {amount.toFixed(2)}</span></div>
-          <div className="flex justify-between text-muted-foreground"><span>Taxa plataforma ({PLATFORM_FEE_PERCENT}%)</span><span>R$ {platformFee.toFixed(2)}</span></div>
-          <div className="border-t pt-2 flex justify-between font-bold"><span>Pagamento do criador</span><span className="text-success">R$ {creatorPayout.toFixed(2)}</span></div>
+          <div className="flex justify-between"><span>Valor da campanha</span><span className="font-semibold">{formatFromUSD(amount)}</span></div>
+          <div className="flex justify-between text-muted-foreground"><span>Taxa plataforma ({PLATFORM_FEE_PERCENT}%)</span><span>{formatFromUSD(platformFee)}</span></div>
+          <div className="border-t pt-2 flex justify-between font-bold"><span>Pagamento do criador</span><span className="text-success">{formatFromUSD(creatorPayout)}</span></div>
         </div>
 
         {/* Method selection */}
@@ -159,7 +161,7 @@ export const PaymentCheckout = ({
           </Button>
           <Button onClick={handlePay} disabled={loading} className="flex-1 bg-gradient-primary hover:opacity-90">
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            {loading ? 'Processando...' : `Pagar R$ ${amount.toFixed(2)}`}
+            {loading ? 'Processando...' : `Pagar ${formatFromUSD(amount)}`}
           </Button>
         </div>
       </CardContent>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useLocalization } from '@/hooks/useLocalization';
+import { useExchangeRates } from '@/hooks/useExchangeRates';
 import { Currency, Country, currencies, countries, formatCurrency } from '@/lib/currencies';
 
 interface LocalizationContextType {
@@ -10,33 +11,57 @@ interface LocalizationContextType {
   setCountry: (code: string) => void;
   setRegion: (code: string) => void;
   format: (amount: number) => string;
+  /** Format an amount that is stored in USD, converting to user's currency */
+  formatFromUSD: (amountInUSD: number) => string;
+  /** Convert amount from one currency to another */
+  convert: (amount: number, from: string, to: string) => number;
+  /** Get exchange rate between two currencies */
+  getRate: (from: string, to: string) => number;
   getCurrentCurrency: () => Currency | undefined;
   getCurrentCountry: () => Country | undefined;
   currencies: Currency[];
   countries: Country[];
+  ratesLoading: boolean;
 }
 
-// Default fallback context for SSR/HMR safety
 const defaultContext: LocalizationContextType = {
-  currency: 'BRL',
-  country: 'BR',
-  region: 'south_america',
+  currency: 'USD',
+  country: 'US',
+  region: 'north_america',
   setCurrency: () => {},
   setCountry: () => {},
   setRegion: () => {},
-  format: (amount: number) => formatCurrency(amount, 'BRL', 'pt-BR'),
-  getCurrentCurrency: () => currencies.find(c => c.code === 'BRL'),
-  getCurrentCountry: () => countries.find(c => c.code === 'BR'),
+  format: (amount: number) => formatCurrency(amount, 'USD', 'en-US'),
+  formatFromUSD: (amount: number) => formatCurrency(amount, 'USD', 'en-US'),
+  convert: (amount: number) => amount,
+  getRate: () => 1,
+  getCurrentCurrency: () => currencies.find(c => c.code === 'USD'),
+  getCurrentCountry: () => countries.find(c => c.code === 'US'),
   currencies,
   countries,
+  ratesLoading: false,
 };
 
 const LocalizationContext = createContext<LocalizationContextType>(defaultContext);
 
 export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
   const localization = useLocalization();
+  const { convert, getRate, loading: ratesLoading } = useExchangeRates();
 
-  const value = useMemo(() => localization, [
+  const formatFromUSD = useMemo(() => {
+    return (amountInUSD: number): string => {
+      const converted = convert(amountInUSD, 'USD', localization.currency);
+      return localization.format(converted);
+    };
+  }, [convert, localization.currency, localization.format]);
+
+  const value = useMemo<LocalizationContextType>(() => ({
+    ...localization,
+    formatFromUSD,
+    convert,
+    getRate,
+    ratesLoading,
+  }), [
     localization.currency,
     localization.country,
     localization.region,
@@ -46,6 +71,10 @@ export const LocalizationProvider = ({ children }: { children: ReactNode }) => {
     localization.setRegion,
     localization.getCurrentCurrency,
     localization.getCurrentCountry,
+    formatFromUSD,
+    convert,
+    getRate,
+    ratesLoading,
   ]);
 
   return (

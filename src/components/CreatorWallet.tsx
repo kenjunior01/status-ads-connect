@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ import {
 
 export const CreatorWallet = () => {
   const { wallet, transactions, loading, requestWithdrawal } = useWallet();
+  const { formatFromUSD } = useLocalizationContext();
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [pixKey, setPixKey] = useState("");
   const [withdrawing, setWithdrawing] = useState(false);
@@ -104,7 +106,7 @@ export const CreatorWallet = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Saldo Disponível</p>
-                <p className="text-2xl font-bold text-green-600">R$ {available.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-600">{formatFromUSD(available)}</p>
               </div>
             </div>
           </CardContent>
@@ -118,7 +120,7 @@ export const CreatorWallet = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Saldo Pendente</p>
-                <p className="text-2xl font-bold text-yellow-600">R$ {pending.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-yellow-600">{formatFromUSD(pending)}</p>
               </div>
             </div>
           </CardContent>
@@ -132,7 +134,7 @@ export const CreatorWallet = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Ganho</p>
-                <p className="text-2xl font-bold text-primary">R$ {totalEarned.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-primary">{formatFromUSD(totalEarned)}</p>
               </div>
             </div>
           </CardContent>
@@ -153,13 +155,13 @@ export const CreatorWallet = () => {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Saldo disponível: <span className="font-semibold text-green-600">R$ {available.toFixed(2)}</span>
+              Saldo disponível: <span className="font-semibold text-green-600">{formatFromUSD(available)}</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Mínimo: R$ 50,00 • Processamento: segunda-feira • Prazo: 1-2 dias úteis via Pix
+              Mínimo: $10.00 • Processamento: segunda-feira • Prazo: 1-2 dias úteis
             </p>
             <div>
-              <Label>Valor do Saque (R$)</Label>
+              <Label>Valor do Saque ($)</Label>
               <Input
                 type="number"
                 min={50}
@@ -217,7 +219,7 @@ export const CreatorWallet = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`font-semibold ${tx.type === 'escrow_release' ? 'text-green-600' : tx.type === 'withdrawal' ? 'text-red-500' : ''}`}>
-                      {tx.type === 'withdrawal' ? '-' : '+'}R$ {Number(tx.net_amount || tx.amount).toFixed(2)}
+                      {tx.type === 'withdrawal' ? '-' : '+'}{formatFromUSD(Number(tx.net_amount || tx.amount))}
                     </span>
                     {getStatusBadge(tx.status)}
                   </div>

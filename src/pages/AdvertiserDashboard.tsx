@@ -19,6 +19,7 @@ import { StatusAIROIPredictor } from "@/components/StatusAIROIPredictor";
 import { PaymentCheckout } from "@/components/PaymentCheckout";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { useProfile } from "@/hooks/useProfile";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
 import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot, CreditCard } from "lucide-react";
@@ -31,6 +32,7 @@ export const AdvertiserDashboard = () => {
   const { campaigns, loading: campaignsLoading, refetch } = useCampaigns();
   const { profiles, loading: profilesLoading } = useProfiles();
   const { profile } = useProfile();
+  const { formatFromUSD } = useLocalizationContext();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const totalSpent = campaigns.filter(c => c.status === 'completed').reduce((sum, c) => sum + Number(c.price), 0);
@@ -109,7 +111,7 @@ export const AdvertiserDashboard = () => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="primary" />
-          <MetricsCard title="Total Investido" value={`R$ ${totalSpent.toFixed(0)}`} icon={DollarSign} variant="success" />
+          <MetricsCard title="Total Investido" value={formatFromUSD(totalSpent)} icon={DollarSign} variant="success" />
           <MetricsCard title="Criadores Disponíveis" value={profiles.length} icon={Eye} variant="warning" subtitle="na plataforma" />
           <MetricsCard title="Campanhas Totais" value={campaigns.length} icon={TrendingUp} variant="default" />
         </div>
@@ -144,7 +146,7 @@ export const AdvertiserDashboard = () => {
                   ) : (
                     campaigns.slice(0, 3).map((campaign) => (
                       <div key={campaign.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                        <div><div className="font-medium">{campaign.title}</div><div className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</div></div>
+                        <div><div className="font-medium">{campaign.title}</div><div className="text-sm text-muted-foreground">{formatFromUSD(Number(campaign.price))}</div></div>
                         <Badge className={getStatusColor(campaign.status || 'pending')}>{campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}</Badge>
                       </div>
                     ))
@@ -176,7 +178,7 @@ export const AdvertiserDashboard = () => {
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">{campaign.description}</p>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                          <span className="font-medium text-success">{formatFromUSD(Number(campaign.price))}</span>
                           <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
                             {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
                           </Badge>
@@ -236,7 +238,7 @@ export const AdvertiserDashboard = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-semibold">{campaign.title}</h3>
-                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                              <p className="text-sm text-muted-foreground">{formatFromUSD(Number(campaign.price))}</p>
                             </div>
                             <div className="flex items-center gap-2">
                               <VerificationBadge status={(campaign.verification_status as 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected') || 'not_started'} />
@@ -287,7 +289,7 @@ export const AdvertiserDashboard = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-semibold">{campaign.title}</h3>
-                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                              <p className="text-sm text-muted-foreground">{formatFromUSD(Number(campaign.price))}</p>
                             </div>
                             <Button size="sm" className="bg-gradient-primary hover:opacity-90">
                               <CreditCard className="h-4 w-4 mr-2" />

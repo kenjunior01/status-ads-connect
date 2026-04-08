@@ -20,6 +20,7 @@ import { GamificationBadge } from "@/components/GamificationBadge";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { SwipeCampaignCards } from "@/components/SwipeCampaignCards";
 import { useProfile } from "@/hooks/useProfile";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
@@ -44,6 +45,7 @@ export const CreatorDashboard = () => {
   const { profile, loading: profileLoading } = useProfile();
   const { campaigns, loading: campaignsLoading } = useCampaigns();
   const isMobile = useIsMobile();
+  const { formatFromUSD } = useLocalizationContext();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const completedCampaigns = campaigns.filter(c => c.status === 'completed');
@@ -94,8 +96,8 @@ export const CreatorDashboard = () => {
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" />
-          <MetricsCard title="Este Mês" value={`R$ ${monthlyEarnings.toFixed(2)}`} icon={TrendingUp} variant="primary" />
+          <MetricsCard title="Total Ganho" value={formatFromUSD(totalEarnings)} icon={DollarSign} variant="success" />
+          <MetricsCard title="Este Mês" value={formatFromUSD(monthlyEarnings)} icon={TrendingUp} variant="primary" />
           <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="warning" subtitle="Em andamento" />
           <MetricsCard title="Avaliação Média" value={profile?.rating || 0} icon={Star} variant="default" subtitle={`${profile?.total_reviews || 0} avaliações`} />
         </div>
@@ -174,7 +176,7 @@ export const CreatorDashboard = () => {
                       </div>
                       <p className="text-sm text-muted-foreground">{campaign.description}</p>
                       <div className="flex items-center gap-4 text-sm">
-                        <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                         <span className="font-medium text-success">{formatFromUSD(Number(campaign.price))}</span>
                         <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
                           {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
                         </Badge>
@@ -201,7 +203,7 @@ export const CreatorDashboard = () => {
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">{campaign.description}</p>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                          <span className="font-medium text-success">{formatFromUSD(Number(campaign.price))}</span>
                           <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
                             {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
                           </Badge>

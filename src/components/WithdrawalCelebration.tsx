@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PartyPopper, Coins, Trophy } from "lucide-react";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 
 interface WithdrawalCelebrationProps {
   show: boolean;
@@ -54,6 +55,7 @@ const ConfettiPiece = ({ index }: { index: number }) => {
 
 export const WithdrawalCelebration = ({ show, amount, onComplete }: WithdrawalCelebrationProps) => {
   const [confetti, setConfetti] = useState<number[]>([]);
+  const { formatFromUSD } = useLocalizationContext();
 
   useEffect(() => {
     if (show) {
@@ -112,7 +114,7 @@ export const WithdrawalCelebration = ({ show, amount, onComplete }: WithdrawalCe
               transition={{ type: "spring", delay: 0.6 }}
             >
               <Coins className="h-8 w-8" />
-              <span>R$ {amount.toFixed(2)}</span>
+              <span>{formatFromUSD(amount)}</span>
             </motion.div>
 
             <motion.div
