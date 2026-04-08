@@ -61,6 +61,16 @@ export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps)
     }
   };
 
+  const handleAIValidation = async () => {
+    if (!preview && !linkUrl) return;
+    const imageUrl = preview || linkUrl;
+    const result = await validateProof('preview', imageUrl);
+    if (result) {
+      setAiAnalysis(result);
+      setAiValidated(true);
+    }
+  };
+
   const handleSubmit = async () => {
     const result = await uploadProof({
       campaign_id: campaignId,
@@ -71,10 +81,16 @@ export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps)
     });
 
     if (result) {
+      // If we have a preview (screenshot), trigger AI validation on the uploaded proof
+      if (result.file_url && proofType === 'screenshot') {
+        validateProof(result.id, result.file_url);
+      }
       setFile(null);
       setLinkUrl('');
       setViewCount('');
       setPreview(null);
+      setAiAnalysis(null);
+      setAiValidated(false);
       onSuccess?.();
     }
   };
