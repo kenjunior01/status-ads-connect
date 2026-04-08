@@ -167,19 +167,19 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
   const renderStep2 = () => (
     <div className="space-y-6">
       <div>
-        <Label>Orçamento: R$ {formData.budget}</Label>
+        <Label>Orçamento: {formatFromUSD(formData.budget)}</Label>
         <div className="mt-4 px-2">
           <Slider
             value={[formData.budget]}
             onValueChange={(value) => setFormData({ ...formData, budget: value[0] })}
-            min={50}
+            min={10}
             max={5000}
-            step={50}
+            step={10}
           />
         </div>
         <div className="flex justify-between text-sm text-muted-foreground mt-2">
-          <span>R$ 50</span>
-          <span>R$ 5.000</span>
+          <span>{formatFromUSD(10)}</span>
+          <span>{formatFromUSD(5000)}</span>
         </div>
       </div>
 
