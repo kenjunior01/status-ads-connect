@@ -33,11 +33,14 @@ interface ProofUploadFormProps {
 export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps) => {
   const { t } = useTranslation();
   const { proofs, loading, uploading, uploadProof } = useCampaignProofs(campaignId);
+  const { validateProof, analyzing } = useStatusAI();
   const [proofType, setProofType] = useState<'screenshot' | 'video' | 'link'>('screenshot');
   const [file, setFile] = useState<File | null>(null);
   const [linkUrl, setLinkUrl] = useState('');
   const [viewCount, setViewCount] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [aiValidated, setAiValidated] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
