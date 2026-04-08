@@ -36,6 +36,7 @@ export const PaymentCheckout = ({
   const [loading, setLoading] = useState(false);
   const [mpesaPhone, setMpesaPhone] = useState('');
   const { toast } = useToast();
+  const { formatFromUSD } = useLocalizationContext();
 
   const platformFee = Math.round(amount * PLATFORM_FEE_PERCENT) / 100;
   const creatorPayout = amount - platformFee;
