@@ -203,7 +203,7 @@ export const CreatorDashboard = () => {
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">{campaign.description}</p>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className="font-medium text-success">R$ {Number(campaign.price).toFixed(2)}</span>
+                          <span className="font-medium text-success">{formatFromUSD(Number(campaign.price))}</span>
                           <Badge variant={campaign.status === 'active' ? 'default' : campaign.status === 'completed' ? 'secondary' : 'outline'}>
                             {campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}
                           </Badge>
