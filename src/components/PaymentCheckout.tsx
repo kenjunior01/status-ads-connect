@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocalizationContext } from '@/contexts/LocalizationContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
