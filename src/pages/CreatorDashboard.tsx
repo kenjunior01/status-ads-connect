@@ -84,6 +84,8 @@ export const CreatorDashboard = () => {
         {/* Onboarding */}
         <OnboardingFlow
           profile={profile}
+          role="creator"
+          campaignCount={campaigns.length}
           onAction={(action) => {
             if (action === 'name' || action === 'niche' || action === 'avatar') setActiveTab('profile');
             if (action === 'first_campaign') setActiveTab('campaigns');

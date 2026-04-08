@@ -75,6 +75,20 @@ export const AdvertiserDashboard = () => {
           </div>
         </div>
 
+        {/* Onboarding for advertiser */}
+        <OnboardingFlow
+          profile={profile}
+          role="advertiser"
+          campaignCount={campaigns.length}
+          onAction={(action) => {
+            if (action === 'create_campaign') setActiveTab('campaigns');
+            if (action === 'find_creator') setActiveTab('statusai');
+            if (action === 'make_payment') setActiveTab('payments');
+            if (action === 'review_proof') setActiveTab('verification');
+          }}
+          onDismiss={() => {}}
+        />
+
         {/* Prominent CTA for empty state */}
         {campaigns.length === 0 && (
           <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
