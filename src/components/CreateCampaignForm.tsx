@@ -45,6 +45,8 @@ const categories = [
 export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormProps) => {
   const { createCampaign, creating } = useCampaigns();
   const { profiles, loading: loadingProfiles } = useProfiles();
+  const { formatFromUSD, getCurrentCurrency } = useLocalizationContext();
+  const currSymbol = getCurrentCurrency()?.symbol || '$';
   
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
