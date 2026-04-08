@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { 
   User, Camera, FileText, Zap, CheckCircle, ArrowRight, X, 
-  Globe, Shield, TrendingUp, Sparkles 
+  Globe, Shield, TrendingUp, Sparkles, Target, Bot, CreditCard, Upload
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,6 @@ interface OnboardingStep {
   title: string;
   description: string;
   isComplete: boolean;
-  action?: () => void;
   actionLabel?: string;
 }
 
@@ -28,13 +27,15 @@ interface OnboardingFlowProps {
     is_verified?: boolean;
     total_campaigns?: number;
   } | null;
+  role?: 'creator' | 'advertiser' | string | null;
+  campaignCount?: number;
   onAction: (action: string) => void;
   onDismiss: () => void;
 }
 
 const ONBOARDING_DISMISSED_KEY = "statusads_onboarding_dismissed";
 
-export const OnboardingFlow = ({ profile, onAction, onDismiss }: OnboardingFlowProps) => {
+export const OnboardingFlow = ({ profile, role, campaignCount = 0, onAction, onDismiss }: OnboardingFlowProps) => {
   const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
   const [currentHighlight, setCurrentHighlight] = useState(0);
@@ -44,7 +45,9 @@ export const OnboardingFlow = ({ profile, onAction, onDismiss }: OnboardingFlowP
     if (stored === "true") setDismissed(true);
   }, []);
 
-  const steps: OnboardingStep[] = [
+  const isAdvertiser = role === 'advertiser';
+
+  const creatorSteps: OnboardingStep[] = [
     {
       id: "name",
       icon: User,
@@ -71,23 +74,58 @@ export const OnboardingFlow = ({ profile, onAction, onDismiss }: OnboardingFlowP
     },
     {
       id: "first_campaign",
-      icon: Zap,
-      title: "Aceite sua primeira campanha",
-      description: "Comece a monetizar seus Status do WhatsApp",
+      icon: Upload,
+      title: "Envie sua primeira prova",
+      description: "Complete uma campanha e envie o comprovante para ganhar",
       isComplete: (profile?.total_campaigns || 0) > 0,
       actionLabel: "Ver Campanhas",
     },
   ];
 
+  const advertiserSteps: OnboardingStep[] = [
+    {
+      id: "create_campaign",
+      icon: Target,
+      title: "Crie sua primeira campanha",
+      description: "Defina título, orçamento e escolha um criador",
+      isComplete: campaignCount > 0,
+      actionLabel: "Nova Campanha",
+    },
+    {
+      id: "find_creator",
+      icon: Bot,
+      title: "Use o StatusAI Matchmaker",
+      description: "Encontre o criador ideal com inteligência artificial",
+      isComplete: false, // dynamic
+      actionLabel: "Ir para StatusAI",
+    },
+    {
+      id: "make_payment",
+      icon: CreditCard,
+      title: "Faça o pagamento seguro",
+      description: "Pague via Stripe, PayPal ou M-Pesa com proteção escrow",
+      isComplete: false,
+      actionLabel: "Ver Pagamentos",
+    },
+    {
+      id: "review_proof",
+      icon: CheckCircle,
+      title: "Acompanhe a verificação",
+      description: "Revise as provas enviadas pelos criadores",
+      isComplete: false,
+      actionLabel: "Ver Verificações",
+    },
+  ];
+
+  const steps = isAdvertiser ? advertiserSteps : creatorSteps;
   const completedSteps = steps.filter(s => s.isComplete).length;
   const progress = (completedSteps / steps.length) * 100;
   const allComplete = completedSteps === steps.length;
 
-  // Auto-highlight next incomplete step
   useEffect(() => {
     const nextIncomplete = steps.findIndex(s => !s.isComplete);
     if (nextIncomplete >= 0) setCurrentHighlight(nextIncomplete);
-  }, [profile]);
+  }, [profile, campaignCount]);
 
   if (dismissed || allComplete) return null;
 
@@ -104,7 +142,6 @@ export const OnboardingFlow = ({ profile, onAction, onDismiss }: OnboardingFlowP
       exit={{ opacity: 0, y: -10 }}
       className="glass border-border/40 rounded-xl p-4 md:p-5 relative overflow-hidden"
     >
-      {/* Dismiss */}
       <button
         onClick={handleDismiss}
         className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors z-10"
@@ -112,14 +149,13 @@ export const OnboardingFlow = ({ profile, onAction, onDismiss }: OnboardingFlowP
         <X className="h-4 w-4" />
       </button>
 
-      {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div className="bg-primary/10 p-2 rounded-lg">
           <Sparkles className="h-5 w-5 text-primary" />
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-sm text-foreground">
-            Comece com tudo! 🚀
+            {isAdvertiser ? "Lance sua primeira campanha! 🚀" : "Comece com tudo! 🚀"}
           </h3>
           <p className="text-xs text-muted-foreground">
             {completedSteps}/{steps.length} passos concluídos
@@ -130,10 +166,8 @@ export const OnboardingFlow = ({ profile, onAction, onDismiss }: OnboardingFlowP
         </div>
       </div>
 
-      {/* Progress bar */}
       <Progress value={progress} className="h-1.5 mb-4" />
 
-      {/* Steps */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
         {steps.map((step, i) => {
           const Icon = step.icon;

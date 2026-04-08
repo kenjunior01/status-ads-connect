@@ -252,7 +252,7 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
                     {profile.price_range && <span>{profile.price_range}</span>}
                   </div>
                 </div>
-                {formData.selectedCreatorId === profile.profile_id && (
+                {formData.selectedCreatorId === (profile.profile_id || profile.id) && (
                   <Check className="h-5 w-5 text-primary" />
                 )}
               </div>
