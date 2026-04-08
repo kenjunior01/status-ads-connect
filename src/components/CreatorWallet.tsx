@@ -218,7 +218,7 @@ export const CreatorWallet = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`font-semibold ${tx.type === 'escrow_release' ? 'text-green-600' : tx.type === 'withdrawal' ? 'text-red-500' : ''}`}>
-                      {tx.type === 'withdrawal' ? '-' : '+'}R$ {Number(tx.net_amount || tx.amount).toFixed(2)}
+                      {tx.type === 'withdrawal' ? '-' : '+'}{formatFromUSD(Number(tx.net_amount || tx.amount))}
                     </span>
                     {getStatusBadge(tx.status)}
                   </div>
