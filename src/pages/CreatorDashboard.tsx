@@ -96,8 +96,8 @@ export const CreatorDashboard = () => {
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricsCard title="Total Ganho" value={`R$ ${totalEarnings.toFixed(2)}`} icon={DollarSign} variant="success" />
-          <MetricsCard title="Este Mês" value={`R$ ${monthlyEarnings.toFixed(2)}`} icon={TrendingUp} variant="primary" />
+          <MetricsCard title="Total Ganho" value={formatFromUSD(totalEarnings)} icon={DollarSign} variant="success" />
+          <MetricsCard title="Este Mês" value={formatFromUSD(monthlyEarnings)} icon={TrendingUp} variant="primary" />
           <MetricsCard title="Campanhas Ativas" value={activeCampaigns.length} icon={Target} variant="warning" subtitle="Em andamento" />
           <MetricsCard title="Avaliação Média" value={profile?.rating || 0} icon={Star} variant="default" subtitle={`${profile?.total_reviews || 0} avaliações`} />
         </div>
