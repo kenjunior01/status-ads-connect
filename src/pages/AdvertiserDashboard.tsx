@@ -17,6 +17,8 @@ import { VerificationBadge } from "@/components/VerificationBadge";
 import { StatusAIMatchmaker } from "@/components/StatusAIMatchmaker";
 import { StatusAIROIPredictor } from "@/components/StatusAIROIPredictor";
 import { PaymentCheckout } from "@/components/PaymentCheckout";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
 import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot, CreditCard } from "lucide-react";
@@ -28,6 +30,7 @@ export const AdvertiserDashboard = () => {
   const [selectedCampaignForPayment, setSelectedCampaignForPayment] = useState<any>(null);
   const { campaigns, loading: campaignsLoading, refetch } = useCampaigns();
   const { profiles, loading: profilesLoading } = useProfiles();
+  const { profile } = useProfile();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const totalSpent = campaigns.filter(c => c.status === 'completed').reduce((sum, c) => sum + Number(c.price), 0);
@@ -71,6 +74,20 @@ export const AdvertiserDashboard = () => {
             <Button variant="outline" size="sm"><Settings className="h-4 w-4 mr-2" />Configurações</Button>
           </div>
         </div>
+
+        {/* Onboarding for advertiser */}
+        <OnboardingFlow
+          profile={profile}
+          role="advertiser"
+          campaignCount={campaigns.length}
+          onAction={(action) => {
+            if (action === 'create_campaign') setActiveTab('campaigns');
+            if (action === 'find_creator') setActiveTab('statusai');
+            if (action === 'make_payment') setActiveTab('payments');
+            if (action === 'review_proof') setActiveTab('verification');
+          }}
+          onDismiss={() => {}}
+        />
 
         {/* Prominent CTA for empty state */}
         {campaigns.length === 0 && (

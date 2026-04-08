@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useCampaignProofs } from '@/hooks/useCampaignProofs';
+import { useStatusAI } from '@/hooks/useStatusAI';
 import { 
   Upload, 
   Image, 
@@ -15,9 +16,14 @@ import {
   Eye,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  Bot,
+  AlertTriangle,
+  ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 interface ProofUploadFormProps {
   campaignId: string;
@@ -27,11 +33,14 @@ interface ProofUploadFormProps {
 export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps) => {
   const { t } = useTranslation();
   const { proofs, loading, uploading, uploadProof } = useCampaignProofs(campaignId);
+  const { validateProof, analyzing } = useStatusAI();
   const [proofType, setProofType] = useState<'screenshot' | 'video' | 'link'>('screenshot');
   const [file, setFile] = useState<File | null>(null);
   const [linkUrl, setLinkUrl] = useState('');
   const [viewCount, setViewCount] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [aiValidated, setAiValidated] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +61,16 @@ export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps)
     }
   };
 
+  const handleAIValidation = async () => {
+    if (!preview && !linkUrl) return;
+    const imageUrl = preview || linkUrl;
+    const result = await validateProof('preview', imageUrl);
+    if (result) {
+      setAiAnalysis(result);
+      setAiValidated(true);
+    }
+  };
+
   const handleSubmit = async () => {
     const result = await uploadProof({
       campaign_id: campaignId,
@@ -62,10 +81,16 @@ export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps)
     });
 
     if (result) {
+      // If we have a preview (screenshot), trigger AI validation on the uploaded proof
+      if (result.file_url && proofType === 'screenshot') {
+        validateProof(result.id, result.file_url);
+      }
       setFile(null);
       setLinkUrl('');
       setViewCount('');
       setPreview(null);
+      setAiAnalysis(null);
+      setAiValidated(false);
       onSuccess?.();
     }
   };
@@ -179,6 +204,73 @@ export const ProofUploadForm = ({ campaignId, onSuccess }: ProofUploadFormProps)
               placeholder="Ex: 1500"
             />
           </div>
+
+          {/* AI Pre-validation */}
+          {(preview || (proofType === 'link' && linkUrl)) && !aiValidated && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleAIValidation}
+              disabled={analyzing}
+              className="w-full border-primary/30 text-primary hover:bg-primary/5"
+            >
+              {analyzing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  StatusAI analisando...
+                </>
+              ) : (
+                <>
+                  <Bot className="h-4 w-4 mr-2" />
+                  Validar com StatusAI antes de enviar
+                </>
+              )}
+            </Button>
+          )}
+
+          {/* AI Analysis Result */}
+          {aiAnalysis && (
+            <div className={cn(
+              "rounded-lg border p-3 space-y-2",
+              aiAnalysis.is_valid_status
+                ? "border-primary/30 bg-primary/5"
+                : "border-warning/30 bg-warning/5"
+            )}>
+              <div className="flex items-center gap-2">
+                {aiAnalysis.is_valid_status ? (
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                ) : (
+                  <AlertTriangle className="h-4 w-4 text-warning" />
+                )}
+                <span className="text-sm font-medium">
+                  {aiAnalysis.is_valid_status ? 'Status válido' : 'Atenção'}
+                </span>
+                <Badge variant="secondary" className="ml-auto text-xs">
+                  Confiança: {Math.round((aiAnalysis.confidence || 0) * 100)}%
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">{aiAnalysis.summary}</p>
+              {aiAnalysis.ad_integrity > 0 && (
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Integridade do anúncio</span>
+                    <span className="font-medium">{Math.round(aiAnalysis.ad_integrity * 100)}%</span>
+                  </div>
+                  <Progress value={aiAnalysis.ad_integrity * 100} className="h-1" />
+                </div>
+              )}
+              {aiAnalysis.issues?.length > 0 && (
+                <ul className="text-xs text-warning space-y-0.5">
+                  {aiAnalysis.issues.map((issue: string, i: number) => (
+                    <li key={i} className="flex items-start gap-1">
+                      <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                      {issue}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           <Button 
             onClick={handleSubmit} 
