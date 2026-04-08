@@ -17,6 +17,8 @@ import { VerificationBadge } from "@/components/VerificationBadge";
 import { StatusAIMatchmaker } from "@/components/StatusAIMatchmaker";
 import { StatusAIROIPredictor } from "@/components/StatusAIROIPredictor";
 import { PaymentCheckout } from "@/components/PaymentCheckout";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { useProfile } from "@/hooks/useProfile";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useProfiles } from "@/hooks/useProfiles";
 import { Plus, Target, TrendingUp, Eye, Settings, DollarSign, Loader2, CheckCircle, Bot, CreditCard } from "lucide-react";
