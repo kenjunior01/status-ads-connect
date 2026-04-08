@@ -289,7 +289,7 @@ export const AdvertiserDashboard = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-semibold">{campaign.title}</h3>
-                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                              <p className="text-sm text-muted-foreground">{formatFromUSD(Number(campaign.price))}</p>
                             </div>
                             <Button size="sm" className="bg-gradient-primary hover:opacity-90">
                               <CreditCard className="h-4 w-4 mr-2" />

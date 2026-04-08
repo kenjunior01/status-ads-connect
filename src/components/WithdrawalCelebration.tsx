@@ -114,7 +114,7 @@ export const WithdrawalCelebration = ({ show, amount, onComplete }: WithdrawalCe
               transition={{ type: "spring", delay: 0.6 }}
             >
               <Coins className="h-8 w-8" />
-              <span>R$ {amount.toFixed(2)}</span>
+              <span>{formatFromUSD(amount)}</span>
             </motion.div>
 
             <motion.div

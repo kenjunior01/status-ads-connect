@@ -285,7 +285,7 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Orçamento:</span>
-            <span className="font-medium text-primary">R$ {formData.budget}</span>
+            <span className="font-medium text-primary">{formatFromUSD(formData.budget)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Prazo:</span>
