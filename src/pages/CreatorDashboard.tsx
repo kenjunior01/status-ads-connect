@@ -20,6 +20,7 @@ import { GamificationBadge } from "@/components/GamificationBadge";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { SwipeCampaignCards } from "@/components/SwipeCampaignCards";
 import { useProfile } from "@/hooks/useProfile";
+import { useLocalizationContext } from "@/contexts/LocalizationContext";
 import { useCampaigns } from "@/hooks/useCampaigns";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
