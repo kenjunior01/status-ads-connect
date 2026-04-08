@@ -238,7 +238,7 @@ export const AdvertiserDashboard = () => {
                           <div className="flex justify-between items-center">
                             <div>
                               <h3 className="font-semibold">{campaign.title}</h3>
-                              <p className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</p>
+                              <p className="text-sm text-muted-foreground">{formatFromUSD(Number(campaign.price))}</p>
                             </div>
                             <div className="flex items-center gap-2">
                               <VerificationBadge status={(campaign.verification_status as 'not_started' | 'proof_submitted' | 'under_review' | 'verified' | 'rejected') || 'not_started'} />
