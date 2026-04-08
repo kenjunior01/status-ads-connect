@@ -32,6 +32,7 @@ export const AdvertiserDashboard = () => {
   const { campaigns, loading: campaignsLoading, refetch } = useCampaigns();
   const { profiles, loading: profilesLoading } = useProfiles();
   const { profile } = useProfile();
+  const { formatFromUSD } = useLocalizationContext();
 
   const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'pending');
   const totalSpent = campaigns.filter(c => c.status === 'completed').reduce((sum, c) => sum + Number(c.price), 0);
