@@ -55,6 +55,7 @@ const ConfettiPiece = ({ index }: { index: number }) => {
 
 export const WithdrawalCelebration = ({ show, amount, onComplete }: WithdrawalCelebrationProps) => {
   const [confetti, setConfetti] = useState<number[]>([]);
+  const { formatFromUSD } = useLocalizationContext();
 
   useEffect(() => {
     if (show) {
