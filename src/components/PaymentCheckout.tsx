@@ -161,7 +161,7 @@ export const PaymentCheckout = ({
           </Button>
           <Button onClick={handlePay} disabled={loading} className="flex-1 bg-gradient-primary hover:opacity-90">
             {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            {loading ? 'Processando...' : `Pagar R$ ${amount.toFixed(2)}`}
+            {loading ? 'Processando...' : `Pagar ${formatFromUSD(amount)}`}
           </Button>
         </div>
       </CardContent>
