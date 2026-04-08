@@ -234,7 +234,7 @@ export const CreateCampaignForm = ({ onSubmit, onCancel }: CreateCampaignFormPro
                 key={profile.id}
                 className={cn(
                   "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors",
-                  formData.selectedCreatorId === profile.profile_id
+                  formData.selectedCreatorId === (profile.profile_id || profile.id)
                     ? "border-primary bg-primary/5"
                     : "hover:bg-muted/50"
                 )}
