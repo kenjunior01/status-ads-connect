@@ -104,9 +104,9 @@ export const PaymentCheckout = ({
       <CardContent className="space-y-5">
         {/* Summary */}
         <div className="p-3 bg-muted/50 rounded-lg space-y-2 text-sm">
-          <div className="flex justify-between"><span>Valor da campanha</span><span className="font-semibold">R$ {amount.toFixed(2)}</span></div>
-          <div className="flex justify-between text-muted-foreground"><span>Taxa plataforma ({PLATFORM_FEE_PERCENT}%)</span><span>R$ {platformFee.toFixed(2)}</span></div>
-          <div className="border-t pt-2 flex justify-between font-bold"><span>Pagamento do criador</span><span className="text-success">R$ {creatorPayout.toFixed(2)}</span></div>
+          <div className="flex justify-between"><span>Valor da campanha</span><span className="font-semibold">{formatFromUSD(amount)}</span></div>
+          <div className="flex justify-between text-muted-foreground"><span>Taxa plataforma ({PLATFORM_FEE_PERCENT}%)</span><span>{formatFromUSD(platformFee)}</span></div>
+          <div className="border-t pt-2 flex justify-between font-bold"><span>Pagamento do criador</span><span className="text-success">{formatFromUSD(creatorPayout)}</span></div>
         </div>
 
         {/* Method selection */}
