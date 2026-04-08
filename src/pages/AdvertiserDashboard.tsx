@@ -146,7 +146,7 @@ export const AdvertiserDashboard = () => {
                   ) : (
                     campaigns.slice(0, 3).map((campaign) => (
                       <div key={campaign.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                        <div><div className="font-medium">{campaign.title}</div><div className="text-sm text-muted-foreground">R$ {Number(campaign.price).toFixed(2)}</div></div>
+                        <div><div className="font-medium">{campaign.title}</div><div className="text-sm text-muted-foreground">{formatFromUSD(Number(campaign.price))}</div></div>
                         <Badge className={getStatusColor(campaign.status || 'pending')}>{campaign.status === 'active' ? 'Ativa' : campaign.status === 'completed' ? 'Concluída' : 'Pendente'}</Badge>
                       </div>
                     ))
