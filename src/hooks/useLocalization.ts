@@ -11,10 +11,9 @@ interface LocalizationState {
 const STORAGE_KEY = 'statusads_localization';
 
 const detectUserLocale = (): LocalizationState => {
-  const lang = navigator.language || 'pt-BR';
+  const lang = navigator.language || 'en-US';
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
 
-  // Map timezone/language to country
   const tzCountryMap: Record<string, string> = {
     'America/Sao_Paulo': 'BR', 'America/Fortaleza': 'BR', 'America/Recife': 'BR',
     'America/Bahia': 'BR', 'America/Belem': 'BR', 'America/Manaus': 'BR',
@@ -24,25 +23,26 @@ const detectUserLocale = (): LocalizationState => {
     'America/Mexico_City': 'MX', 'America/Montevideo': 'UY',
     'Europe/Lisbon': 'PT', 'Europe/Madrid': 'ES', 'Europe/Paris': 'FR',
     'Europe/Berlin': 'DE', 'Europe/Rome': 'IT', 'Europe/London': 'GB',
-    'Africa/Maputo': 'MZ', 'Africa/Luanda': 'AO',
-    'America/Toronto': 'CA',
+    'Africa/Maputo': 'MZ', 'Africa/Luanda': 'AO', 'Africa/Johannesburg': 'ZA',
+    'Africa/Lagos': 'NG', 'Africa/Nairobi': 'KE',
+    'America/Toronto': 'CA', 'Asia/Kolkata': 'IN', 'Australia/Sydney': 'AU',
   };
 
   const langCountryMap: Record<string, string> = {
     'pt-BR': 'BR', 'pt-PT': 'PT', 'pt-MZ': 'MZ', 'pt-AO': 'AO', 'pt': 'BR',
-    'en-US': 'US', 'en-GB': 'GB', 'en': 'US',
+    'en-US': 'US', 'en-GB': 'GB', 'en-AU': 'AU', 'en-IN': 'IN', 'en-ZA': 'ZA', 'en': 'US',
     'es-ES': 'ES', 'es-AR': 'AR', 'es-MX': 'MX', 'es-CO': 'CO', 'es-CL': 'CL',
     'es-PE': 'PE', 'es': 'ES',
     'fr': 'FR', 'de': 'DE', 'it': 'IT',
   };
 
-  const detectedCode = tzCountryMap[tz] || langCountryMap[lang] || 'BR';
+  const detectedCode = tzCountryMap[tz] || langCountryMap[lang] || 'US';
   const country = countries.find(c => c.code === detectedCode);
 
   return {
-    currency: country?.currency || 'BRL',
+    currency: country?.currency || 'USD',
     country: detectedCode,
-    region: country?.region || 'south_america',
+    region: country?.region || 'north_america',
   };
 };
 
@@ -50,7 +50,7 @@ export const useLocalization = () => {
   const { i18n } = useTranslation();
 
   const [state, setState] = useState<LocalizationState>(() => {
-    if (typeof window === 'undefined') return { currency: 'BRL', country: 'BR', region: 'south_america' };
+    if (typeof window === 'undefined') return { currency: 'USD', country: 'US', region: 'north_america' };
 
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
@@ -60,11 +60,10 @@ export const useLocalization = () => {
     return detectUserLocale();
   });
 
-  // Auto-set i18n language on first load based on detected locale
   useEffect(() => {
     const stored = localStorage.getItem('statusads_language');
     if (!stored) {
-      const lang = navigator.language || 'pt-BR';
+      const lang = navigator.language || 'en-US';
       const supported = ['pt-BR', 'en-US', 'es-ES'];
       const match = supported.find(s => lang.startsWith(s.split('-')[0]));
       if (match) i18n.changeLanguage(match);
@@ -97,7 +96,7 @@ export const useLocalization = () => {
 
   const format = useCallback((amount: number): string => {
     const currency = currencies.find(c => c.code === state.currency);
-    return formatCurrency(amount, state.currency, currency?.locale || 'pt-BR');
+    return formatCurrency(amount, state.currency, currency?.locale || 'en-US');
   }, [state.currency]);
 
   const getCurrentCurrency = useCallback((): Currency | undefined => {
