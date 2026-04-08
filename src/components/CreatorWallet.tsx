@@ -154,13 +154,13 @@ export const CreatorWallet = () => {
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Saldo disponível: <span className="font-semibold text-green-600">R$ {available.toFixed(2)}</span>
+              Saldo disponível: <span className="font-semibold text-green-600">{formatFromUSD(available)}</span>
             </p>
             <p className="text-xs text-muted-foreground">
-              Mínimo: R$ 50,00 • Processamento: segunda-feira • Prazo: 1-2 dias úteis via Pix
+              Mínimo: $10.00 • Processamento: segunda-feira • Prazo: 1-2 dias úteis
             </p>
             <div>
-              <Label>Valor do Saque (R$)</Label>
+              <Label>Valor do Saque ($)</Label>
               <Input
                 type="number"
                 min={50}
